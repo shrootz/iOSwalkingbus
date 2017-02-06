@@ -12,29 +12,17 @@ class Student {
     // MARK: Properties
     var name: String
     var school: String
-    var medical: String
+    var notes: String
     var photo: UIImage?
 
     // MARK: Initialization
-//    init?(name: String, photo: UIImage?) {
-//        // Initialize stored properties.
-//        self.name = name
-//        self.photo = photo
-//        self.school = ""
-//        self.medical = ""
-//        if name.isEmpty {
-//            return nil
-//        }
-//    }
     
-    init?(name: String, photo: UIImage?, school: String, medical: String) {
+    init?(name: String, photo: UIImage?, school: String, notes: String) {
         // Initialize stored properties.
         self.name = name
         self.photo = photo
-        //self.school = ""
-        //self.medical = ""
         self.school = school
-        self.medical = medical
+        self.notes = notes
         if name.isEmpty {
             return nil
         }

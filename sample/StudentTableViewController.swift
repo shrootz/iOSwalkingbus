@@ -14,13 +14,13 @@ class StudentTableViewController: UITableViewController {
     
     func loadSampleStudents() {
         let photo1 = UIImage(named: "DefaultImage")!
-        let student1 = Student(name: "Bob", photo: photo1, school:"", medical:"")!
+        let student1 = Student(name: "Bob", photo: photo1, school:"", notes:"")!
         
         let photo2 = UIImage(named: "DefaultImage")!
-        let student2 = Student(name: "Sally", photo: photo2, school:"", medical:"")!
+        let student2 = Student(name: "Sally", photo: photo2, school:"", notes:"")!
         
         let photo3 = UIImage(named: "DefaultImage")!
-        let student3 = Student(name: "Tom", photo: photo3, school:"", medical:"")!
+        let student3 = Student(name: "Tom", photo: photo3, school:"", notes:"")!
         
         students += [student1, student2, student3]
     }
@@ -61,12 +61,14 @@ class StudentTableViewController: UITableViewController {
         cell.nameLabel.text = student.name
         cell.photoImageView.image = student.photo
         cell.schoolLabel.text = student.school
-        cell.chaperoneLabel.text = student.medical
+        cell.chaperoneLabel.text = student.notes
         return cell
     }
     
-    @IBAction func unwindToMealList(sender: UIStoryboardSegue) {
-        if let sourceViewController = sender.source as? StudentViewController, let student = sourceViewController.student {
+    
+    
+    @IBAction func unwindToStudentList(sender: UIStoryboardSegue) {
+        if let sourceViewController = sender.source as? EditStudentTableViewController, let student = sourceViewController.student {
             if let selectedIndexPath = tableView.indexPathForSelectedRow {
                 // Update an existing meal.
                 students[selectedIndexPath.row] = student
@@ -80,7 +82,8 @@ class StudentTableViewController: UITableViewController {
             }
         }
     }
-
+    
+    
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
@@ -120,7 +123,7 @@ class StudentTableViewController: UITableViewController {
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowDetail" {
-            let studentDetailViewController = segue.destination as! StudentViewController
+            let studentDetailViewController = segue.destination as! EditStudentTableViewController
             
             // Get the cell that generated this segue.
             if let selectedStudentCell = sender as? StudentTableViewCell {

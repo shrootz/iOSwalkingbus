@@ -79,7 +79,7 @@ class StudentViewController: UIViewController, UITextFieldDelegate, UIImagePicke
             let photo = studentPhoto.image
             //let photo = UIImage(named: "DefaultImage")!
             // Set the meal to be passed to MealTableViewController after the unwind segue.
-            student = Student(name: name, photo: photo, school: school, medical: medical)
+            student = Student(name: name, photo: photo, school: school, notes: medical)
         }
     }
     
@@ -128,7 +128,7 @@ class StudentViewController: UIViewController, UITextFieldDelegate, UIImagePicke
             navigationItem.title = student.name
             nameTextField.text   = student.name
             schoolNameTextField.text = student.school
-            medicalInfoTextField.text = student.medical
+            medicalInfoTextField.text = student.notes
             studentPhoto.image = student.photo
             //ratingControl.rating = student.rating
         }
