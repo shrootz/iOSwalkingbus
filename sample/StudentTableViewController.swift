@@ -71,6 +71,7 @@ class StudentTableViewController: UITableViewController {
         if let sourceViewController = sender.source as? EditStudentTableViewController, let student = sourceViewController.student {
             if let selectedIndexPath = tableView.indexPathForSelectedRow {
                 // Update an existing meal.
+                print("Update an existing meal.")
                 students[selectedIndexPath.row] = student
                 tableView.reloadRows(at: [selectedIndexPath], with: .none)
             }

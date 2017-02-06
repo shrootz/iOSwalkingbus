@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import os.log
 
 class EditStudentTableViewController: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     @IBOutlet weak var student_image: UIImageView!
@@ -79,6 +80,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
         if sender as AnyObject? === saveButton {
+            print("save button tapped for the prepare")
             let name = full_name.text ?? ""
             let school = school_name.text ?? ""
             let notes = student_notes.text ?? ""
@@ -86,20 +88,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             student = Student(name: name, photo: photo, school: school, notes: notes)
         }
     }
-
     
-    
-    @IBAction func cancel(_ sender: Any) {
-        // Depending on style of presentation (modal or push presentation), this view controller needs to be dismissed in two different ways.
-        let isPresentingInAddStudentMode = presentingViewController is UINavigationController
-        
-        if isPresentingInAddStudentMode {
-            dismiss(animated: true, completion: nil)
-        }
-        else {
-            navigationController!.popViewController(animated: true)
-        }
-    }
 
     //MARK: UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool{
