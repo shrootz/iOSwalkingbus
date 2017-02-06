@@ -16,8 +16,22 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     @IBOutlet weak var student_notes: UITextField!
     @IBOutlet weak var saveButton: UIBarButtonItem!
     
+    @IBOutlet weak var monday_am: UIButton!
+    @IBOutlet weak var monday_pm: UIButton!
+    @IBOutlet weak var tuesday_am: UIButton!
+    @IBOutlet weak var tuesday_pm: UIButton!
+    @IBOutlet weak var wednesday_am: UIButton!
+    @IBOutlet weak var wednesday_pm: UIButton!
+    @IBOutlet weak var thursday_am: UIButton!
+    @IBOutlet weak var thursday_pm: UIButton!
+    @IBOutlet weak var friday_am: UIButton!
+    @IBOutlet weak var friday_pm: UIButton!
+    
+    
     var student: Student?
-
+    var coordinates : [String:[Double]] = [:]
+    var names : [String:String] = [:]
+    
     @IBAction func browseForImage(_ sender: UIButton) {
         // Hide the keyboard.
         full_name.resignFirstResponder()
@@ -32,6 +46,18 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         imagePickerController.delegate = self
         
         present(imagePickerController, animated: true, completion: nil)
+    }
+    
+    @IBAction func cancel(_ sender: UIBarButtonItem) {
+        dismiss(animated: true, completion: nil)
+        /*let isPresentingInAddStudentMode = presentingViewController is UINavigationController
+        
+        if isPresentingInAddStudentMode {
+            dismiss(animated: true, completion: nil)
+        }
+        else {
+            navigationController!.popViewController(animated: true)
+        }*/
     }
     
     // MARK: UIImagePickerControllerDelegate
@@ -55,15 +81,53 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         super.viewDidLoad()
         // Handle the text field’s user input through delegate callbacks.
         full_name.delegate = self
-        print("cryhi")
-        
         if let student = student {
-            print("hi")
             navigationItem.title = student.name
             full_name.text   = student.name
             school_name.text = student.school
             student_notes.text = student.notes
             student_image.image = student.photo
+            coordinates = student.schedule_dictionary_coordinates
+            names = student.schedule_dictionary_names
+            if let val = student.schedule_dictionary_names["monday_am"] {
+                monday_am.setTitle(val, for: .normal)
+            }
+            
+            if let val = student.schedule_dictionary_names["monday_pm"] {
+                monday_pm.setTitle(val, for: .normal)
+            }
+            
+            if let val = student.schedule_dictionary_names["tuesday_am"] {
+                tuesday_am.setTitle(val, for: .normal)
+            }
+            
+            if let val = student.schedule_dictionary_names["tuesday_pm"] {
+                tuesday_pm.setTitle(val, for: .normal)
+            }
+            
+            if let val = student.schedule_dictionary_names["wednesday_am"] {
+                wednesday_am.setTitle(val, for: .normal)
+            }
+            
+            if let val = student.schedule_dictionary_names["wednesday_pm"] {
+                wednesday_pm.setTitle(val, for: .normal)
+            }
+            
+            if let val = student.schedule_dictionary_names["thursday_am"] {
+                thursday_am.setTitle(val, for: .normal)
+            }
+            
+            if let val = student.schedule_dictionary_names["thursday_pm"] {
+                thursday_pm.setTitle(val, for: .normal)
+            }
+            
+            if let val = student.schedule_dictionary_names["friday_am"] {
+                friday_am.setTitle(val, for: .normal)
+            }
+            
+            if let val = student.schedule_dictionary_names["friday_pm"] {
+                friday_pm.setTitle(val, for: .normal)
+            }
         }
         
     }
@@ -85,7 +149,81 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             let school = school_name.text ?? ""
             let notes = student_notes.text ?? ""
             let photo = student_image.image
-            student = Student(name: name, photo: photo, school: school, notes: notes)
+            student = Student(name: name, photo: photo, school: school, notes: notes, schedule_dictionary_coordinates: coordinates, schedule_dictionary_names: names)
+        }
+        
+        else if sender as AnyObject? === monday_am {
+            let mapViewController = segue.destination as! MapViewController
+            if let val = coordinates["monday_am"]{
+                mapViewController.latitude = val[0]
+                mapViewController.longitude = val[1]
+            }
+
+        }
+        else if sender as AnyObject? === monday_pm {
+            let mapViewController = segue.destination as! MapViewController
+            if let val = coordinates["monday_pm"]{
+                mapViewController.latitude = val[0]
+                mapViewController.longitude = val[1]
+            }
+            
+        }
+        else if sender as AnyObject? === tuesday_am {
+            let mapViewController = segue.destination as! MapViewController
+            if let val = coordinates["tuesday_am"]{
+                mapViewController.latitude = val[0]
+                mapViewController.longitude = val[1]
+            }
+            
+        }
+        else if sender as AnyObject? === tuesday_pm {
+            let mapViewController = segue.destination as! MapViewController
+            if let val = coordinates["tuesday_pm"]{
+                mapViewController.latitude = val[0]
+                mapViewController.longitude = val[1]
+            }
+        }
+        else if sender as AnyObject? === wednesday_am {
+            let mapViewController = segue.destination as! MapViewController
+            if let val = coordinates["wednesday_am"]{
+                mapViewController.latitude = val[0]
+                mapViewController.longitude = val[1]
+            }
+        }
+        else if sender as AnyObject? === wednesday_pm {
+            let mapViewController = segue.destination as! MapViewController
+            if let val = coordinates["wednesday_pm"]{
+                mapViewController.latitude = val[0]
+                mapViewController.longitude = val[1]
+            }
+        }
+        else if sender as AnyObject? === thursday_am {
+            let mapViewController = segue.destination as! MapViewController
+            if let val = coordinates["thursday_am"]{
+                mapViewController.latitude = val[0]
+                mapViewController.longitude = val[1]
+            }
+        }
+        else if sender as AnyObject? === thursday_pm {
+            let mapViewController = segue.destination as! MapViewController
+            if let val = coordinates["thursday_pm"]{
+                mapViewController.latitude = val[0]
+                mapViewController.longitude = val[1]
+            }
+        }
+        else if sender as AnyObject? === friday_am {
+            let mapViewController = segue.destination as! MapViewController
+            if let val = coordinates["friday_am"]{
+                mapViewController.latitude = val[0]
+                mapViewController.longitude = val[1]
+            }
+        }
+        else if sender as AnyObject? === friday_pm {
+            let mapViewController = segue.destination as! MapViewController
+            if let val = coordinates["friday_pm"]{
+                mapViewController.latitude = val[0]
+                mapViewController.longitude = val[1]
+            }
         }
     }
     

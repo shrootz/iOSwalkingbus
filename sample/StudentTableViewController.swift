@@ -14,13 +14,33 @@ class StudentTableViewController: UITableViewController {
     
     func loadSampleStudents() {
         let photo1 = UIImage(named: "DefaultImage")!
-        let student1 = Student(name: "Bob", photo: photo1, school:"", notes:"")!
+        let coordinates : [String:[Double]] = [
+            "monday_am" : [19.8968, -155.5825],
+            "tuesday_am" : [30.2672, -97.7431],
+            "wednesday_am" :[-41.8101, -68.9063],
+            "thursday_am" :[-33.8688, 151.2093],
+            "friday_am" : [20.5937, 78.9629]
+            
+        ]
         
+        let names : [String:String] = [
+            "monday_am" : "Hawaii",
+            "tuesday_am" : "Austin",
+            "wednesday_am" : "Patagonia",
+            "thursday_am" : "Australia",
+            "friday_am" : "India"
+        ]
+        let student1 = Student(name: "Bob", photo: photo1, school:"", notes:"", schedule_dictionary_coordinates:coordinates, schedule_dictionary_names: names)!
+        
+        let coordinates_empty : [String:[Double]] = [:]
+        
+        let names_empty : [String:String] = [:]
+
         let photo2 = UIImage(named: "DefaultImage")!
-        let student2 = Student(name: "Sally", photo: photo2, school:"", notes:"")!
+        let student2 = Student(name: "Sally", photo: photo2, school:"", notes:"", schedule_dictionary_coordinates:coordinates_empty, schedule_dictionary_names:names_empty)!
         
         let photo3 = UIImage(named: "DefaultImage")!
-        let student3 = Student(name: "Tom", photo: photo3, school:"", notes:"")!
+        let student3 = Student(name: "Tom", photo: photo3, school:"", notes:"", schedule_dictionary_coordinates:coordinates_empty, schedule_dictionary_names:names_empty)!
         
         students += [student1, student2, student3]
     }
@@ -28,7 +48,7 @@ class StudentTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationItem.leftBarButtonItem = editButtonItem
+       // navigationItem.leftBarButtonItem = backBarButtonItem
 
         loadSampleStudents()
         // Uncomment the following line to preserve selection between presentations
@@ -138,4 +158,16 @@ class StudentTableViewController: UITableViewController {
         }
     }
 
+    @IBAction func goHome(_ sender: UIBarButtonItem) {
+        // Depending on style of presentation (modal or push presentation), this view controller needs to be dismissed in two different ways.
+        let isPresentingInAddStudentMode = presentingViewController is UINavigationController
+        
+        if isPresentingInAddStudentMode {
+            dismiss(animated: true, completion: nil)
+        }
+        else {
+            navigationController!.popViewController(animated: true)
+        }
+    }
+    
 }

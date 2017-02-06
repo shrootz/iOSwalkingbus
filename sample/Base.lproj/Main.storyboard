@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="kPk-Sj-PFJ">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="DSY-3J-xfJ">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -91,6 +91,11 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Your Children" id="6ri-DI-eiX">
+                        <barButtonItem key="leftBarButtonItem" title="Home" id="hMC-Gt-CrF">
+                            <connections>
+                                <action selector="goHome:" destination="QZe-w7-hLN" id="YZg-OG-kII"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="LA2-00-jXL">
                             <connections>
                                 <segue destination="WA5-oG-llr" kind="show" identifier="AddItem" id="jbI-PC-UwA"/>
@@ -173,7 +178,9 @@
                             <outlet property="delegate" destination="tc6-wN-zzb" id="EBQ-a4-azN"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Today's Bus" id="LsA-3m-v8c"/>
+                    <navigationItem key="navigationItem" title="Today's Bus" id="LsA-3m-v8c">
+                        <barButtonItem key="leftBarButtonItem" title="Home" id="9qh-uF-EVS"/>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CZb-Df-FAz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -193,7 +200,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZnZ-2A-bwj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1580" y="791"/>
+            <point key="canvasLocation" x="-1578" y="958"/>
         </scene>
         <!--Edit Student Table View Controller-->
         <scene sceneID="UgQ-V0-Io8">
@@ -310,6 +317,9 @@
                                                         <constraint firstAttribute="width" constant="291" identifier="id9" id="CQD-Ym-FNc"/>
                                                     </constraints>
                                                     <state key="normal" title="..."/>
+                                                    <connections>
+                                                        <segue destination="w0W-vp-54b" kind="show" id="XiV-dK-cO9"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yMf-Gi-cwj">
                                                     <rect key="frame" x="16" y="13" width="26" height="21"/>
@@ -344,6 +354,9 @@
                                                         <constraint firstAttribute="width" constant="291" identifier="id17" id="oCP-mM-i5d"/>
                                                     </constraints>
                                                     <state key="normal" title="..."/>
+                                                    <connections>
+                                                        <segue destination="w0W-vp-54b" kind="show" id="TGJ-zW-14Q"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lTV-uC-XM2">
                                                     <rect key="frame" x="16" y="13" width="26" height="21"/>
@@ -382,6 +395,9 @@
                                                         <constraint firstAttribute="width" constant="291" identifier="id25" id="zX0-fN-wP9"/>
                                                     </constraints>
                                                     <state key="normal" title="..."/>
+                                                    <connections>
+                                                        <segue destination="w0W-vp-54b" kind="show" id="g9g-OW-vxJ"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C7e-uk-ovl">
                                                     <rect key="frame" x="16" y="13" width="26" height="21"/>
@@ -416,6 +432,9 @@
                                                         <constraint firstAttribute="width" constant="291" identifier="id33" id="j74-yl-C02"/>
                                                     </constraints>
                                                     <state key="normal" title="..."/>
+                                                    <connections>
+                                                        <segue destination="w0W-vp-54b" kind="show" id="4bu-DX-EWg"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Or-I1-OX3">
                                                     <rect key="frame" x="16" y="13" width="26" height="21"/>
@@ -454,6 +473,9 @@
                                                         <constraint firstAttribute="width" constant="291" identifier="id41" id="Nk2-8a-Qxb"/>
                                                     </constraints>
                                                     <state key="normal" title="..."/>
+                                                    <connections>
+                                                        <segue destination="w0W-vp-54b" kind="show" id="Uzk-UE-si6"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Oiq-BA-kE6">
                                                     <rect key="frame" x="16" y="13" width="26" height="21"/>
@@ -488,6 +510,9 @@
                                                         <constraint firstAttribute="width" constant="291" identifier="id49" id="NMJ-ng-i5z"/>
                                                     </constraints>
                                                     <state key="normal" title="..."/>
+                                                    <connections>
+                                                        <segue destination="w0W-vp-54b" kind="show" id="7AV-DO-IrY"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bIp-CI-CKf">
                                                     <rect key="frame" x="16" y="13" width="26" height="21"/>
@@ -526,6 +551,9 @@
                                                         <constraint firstAttribute="width" constant="291" identifier="id57" id="2vx-Rg-R5B"/>
                                                     </constraints>
                                                     <state key="normal" title="..."/>
+                                                    <connections>
+                                                        <segue destination="w0W-vp-54b" kind="show" id="ZcU-Xi-SwD"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EDY-72-Z7N">
                                                     <rect key="frame" x="16" y="13" width="26" height="21"/>
@@ -560,6 +588,9 @@
                                                         <constraint firstAttribute="width" constant="291" identifier="id65" id="9Pq-Sl-HMl"/>
                                                     </constraints>
                                                     <state key="normal" title="..."/>
+                                                    <connections>
+                                                        <segue destination="w0W-vp-54b" kind="show" id="fLr-KN-Xjg"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Cw3-tB-MSo">
                                                     <rect key="frame" x="16" y="13" width="26" height="21"/>
@@ -598,6 +629,9 @@
                                                         <constraint firstAttribute="width" constant="291" identifier="id73" id="WIo-b7-UDL"/>
                                                     </constraints>
                                                     <state key="normal" title="..."/>
+                                                    <connections>
+                                                        <segue destination="w0W-vp-54b" kind="show" id="iKl-NI-ygi"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bDa-4B-FdB">
                                                     <rect key="frame" x="16" y="13" width="26" height="21"/>
@@ -632,6 +666,9 @@
                                                         <constraint firstAttribute="width" constant="291" identifier="id81" id="Urb-Fg-cHi"/>
                                                     </constraints>
                                                     <state key="normal" title="..."/>
+                                                    <connections>
+                                                        <segue destination="w0W-vp-54b" kind="show" id="Ftg-DE-fFi"/>
+                                                    </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Da-1q-8gY">
                                                     <rect key="frame" x="16" y="13" width="26" height="21"/>
@@ -662,6 +699,11 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="rAW-gw-u6O">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="U9x-Sh-BDC">
+                            <connections>
+                                <action selector="cancel:" destination="Kmd-Nf-26N" id="JSo-ba-cFv"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Save" id="AUw-Ds-0Wa">
                             <connections>
                                 <segue destination="5bf-m8-fum" kind="unwind" unwindAction="unwindToStudentListWithSender:" id="aGP-eJ-3gT"/>
@@ -669,11 +711,21 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="friday_am" destination="qyY-c8-Pei" id="z12-aN-kuK"/>
+                        <outlet property="friday_pm" destination="ZyS-kT-R2S" id="Umq-Qo-XhL"/>
                         <outlet property="full_name" destination="umc-MC-oFi" id="tFf-EX-Pwf"/>
+                        <outlet property="monday_am" destination="a6D-MV-sLH" id="aO0-CW-kkr"/>
+                        <outlet property="monday_pm" destination="CSq-eV-WHb" id="QHh-tH-Hny"/>
                         <outlet property="saveButton" destination="AUw-Ds-0Wa" id="g3A-el-RzH"/>
                         <outlet property="school_name" destination="CSv-yh-BPt" id="9by-0K-COw"/>
                         <outlet property="student_image" destination="1LW-4S-4gC" id="5H3-bL-6aC"/>
                         <outlet property="student_notes" destination="Iq4-gU-vH4" id="4zr-QB-3FL"/>
+                        <outlet property="thursday_am" destination="1gS-hq-2Qg" id="JAl-0R-gDR"/>
+                        <outlet property="thursday_pm" destination="3CA-wp-f1D" id="DK8-bX-xHH"/>
+                        <outlet property="tuesday_am" destination="BVE-YQ-GhB" id="KHM-UK-P7e"/>
+                        <outlet property="tuesday_pm" destination="eF7-Fv-lPy" id="sFs-So-viA"/>
+                        <outlet property="wednesday_am" destination="I0c-Bn-BYV" id="HHE-aB-kRS"/>
+                        <outlet property="wednesday_pm" destination="l6p-0I-uhq" id="Tbl-Iy-cDK"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0yt-qD-2Kn" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -736,7 +788,23 @@
             </objects>
             <point key="canvasLocation" x="2431" y="546"/>
         </scene>
-        <!--View Controller-->
+        <!--Navigation Controller-->
+        <scene sceneID="Qp7-kr-cJI">
+            <objects>
+                <navigationController id="DSY-3J-xfJ" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="nUs-s7-d1v">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="kPk-Sj-PFJ" kind="relationship" relationship="rootViewController" id="fHN-sL-XYC"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dbI-SP-icV" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1457" y="126"/>
+        </scene>
+        <!--Walking Bus-->
         <scene sceneID="bNJ-OP-xHA">
             <objects>
                 <viewController id="kPk-Sj-PFJ" sceneMemberID="viewController">
@@ -749,24 +817,18 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="71S-bo-OQO">
-                                <rect key="frame" x="93" y="222" width="189" height="81"/>
+                                <rect key="frame" x="149" y="90" width="76" height="60"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Welcome to Walking Bus" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lqs-SC-hdI">
-                                        <rect key="frame" x="0.0" y="0.0" width="189" height="20.5"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
                                     <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zTi-wq-oRe">
-                                        <rect key="frame" x="0.0" y="20.5" width="189" height="30"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="76" height="30"/>
                                         <state key="normal" title="Parent"/>
                                         <connections>
                                             <segue destination="H3T-t2-6Bz" kind="show" id="qNG-oC-lMb"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aHV-pb-bfC">
-                                        <rect key="frame" x="0.0" y="50.5" width="189" height="30"/>
+                                        <rect key="frame" x="0.0" y="30" width="76" height="30"/>
                                         <state key="normal" title="Chaperone"/>
                                         <connections>
                                             <segue destination="lgL-Lg-1pG" kind="show" id="v7Q-qH-iK3"/>
@@ -777,6 +839,7 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
+                    <navigationItem key="navigationItem" title="Walking Bus" id="Bgr-Ik-X9m"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oq4-wF-fPU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -787,6 +850,7 @@
         <image name="DefaultImage" width="320" height="320"/>
     </resources>
     <inferredMetricsTieBreakers>
+        <segue reference="iKl-NI-ygi"/>
         <segue reference="uEZ-P6-UyX"/>
     </inferredMetricsTieBreakers>
 </document>
