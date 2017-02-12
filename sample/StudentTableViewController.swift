@@ -7,10 +7,63 @@
 //
 
 import UIKit
+import Firebase
 
 class StudentTableViewController: UITableViewController {
     
     var students = [Student]()
+    var ref: FIRDatabaseReference?
+    var parent_location: String?
+
+    
+    func loadStudents() {
+        print("HI BISH")
+        let photo1 = UIImage(named: "DefaultImage")!
+        let coordinates_empty : [String:[Double]] = [:]
+        let names_empty : [String:String] = [:]
+        
+     //   var resultArray:[String] = []
+     //   var students_array:[Student] = []
+        
+        ref?.child(parent_location!).child("children").observeSingleEvent(of: .value, with: { (snapshot) in
+            for item in snapshot.children {
+                let val = (item as AnyObject).value as String
+                print(val)
+                self.ref?.child("/children/").child(val).observeSingleEvent(of: .value, with: { (snapshot2) in
+                    print("GET")
+                    let student_name = snapshot2.value(forKey: "name") as! String
+                    let student_notes = snapshot2.value(forKey: "bluetooth") as! String
+                    let student1 = Student(name: student_name, photo: photo1, school:"", notes:student_notes, schedule_dictionary_coordinates:coordinates_empty, schedule_dictionary_names:names_empty)!
+                    self.students += [student1]
+                    print("size of students\(self.students.count)")
+                    DispatchQueue.main.async{
+                        self.tableView.reloadData()
+                    }
+                })
+            }
+        })
+        
+       // print("Results Array: \(resultArray)")
+       // print("Results Array Count: \(resultArray.count)")
+        
+        /*ref?.child(parent_location!).child("children").observeSingleEvent(of: .value, with: { snapshot in
+                //let val = snapshot.children.allObjects
+                //print(snapshot.children.allObjects.value as String)
+                for item in snapshot.children.allObjects{
+                    let current_key = (item as AnyObject).key as String
+                    let val = (item as AnyObject).value as String
+                    print(val)
+
+                } */
+                //print("Results Array: \(resultArray)")
+                //print("Results Array Count: \(resultArray.count)")
+            
+          //  })
+        
+    //    ref?.child(parent_location!).child("children").observe(.value, with: { snapshot in
+      //      print(snapshot.value)
+      //  })
+    }
     
     func loadSampleStudents() {
         let photo1 = UIImage(named: "DefaultImage")!
@@ -47,10 +100,19 @@ class StudentTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-       // navigationItem.leftBarButtonItem = backBarButtonItem
-
+        
+       let beeb = self.ref?.child("/children/").childByAutoId()
+        beeb?.setValue(["name": "bob", "bluetooth":"11:11:11:11:11:11", "status":"lost", "parent":"seFA6JsWxJhJsYSCeVtoGgZmwNz2"])
+        let parents_children = parent_location! + "/children"
+        self.ref?.child(parents_children).childByAutoId().setValue((beeb?.key)!)
+    
+        
         loadSampleStudents()
+        loadStudents()
+        
+        
+
+
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 

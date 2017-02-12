@@ -8,15 +8,22 @@
 
 import UIKit
 import GoogleMaps
+import Firebase
+import GoogleSignIn
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
+class AppDelegate: UIResponder, UIApplicationDelegate, GIDSignInDelegate {
+    
     var window: UIWindow?
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         GMSServices.provideAPIKey("AIzaSyB_PTlTjCvvksraHC4A5jWvuSUchYZrV4o")
+        // Use Firebase library to configure APIs
+        FIRApp.configure()
+        
+        GIDSignIn.sharedInstance().clientID = FIRApp.defaultApp()?.options.clientID
+        GIDSignIn.sharedInstance().delegate = self
         // GMSPlacesClient.provideAPIKey("AIzaSyB_PTlTjCvvksraHC4A5jWvuSUchYZrV4o")
         // Override point for customization after application launch.
         return true
@@ -42,7 +49,40 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+    @available(iOS 9.0, *)
+    func application(_ application: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any])
+        -> Bool {
+            return GIDSignIn.sharedInstance().handle(url,
+                                                        sourceApplication:options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String,
+                                                        annotation: [:])
+    }
+    func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+        return GIDSignIn.sharedInstance().handle(url,
+                                                    sourceApplication: sourceApplication,
+                                                    annotation: annotation)
+    }
 
-
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        if let error = error{
+            print (error.localizedDescription)
+            return
+        }
+        let authentication = user.authentication
+        let credentials = FIRGoogleAuthProvider.credential(withIDToken: (authentication?.idToken)!, accessToken: (authentication?.accessToken)!)
+        FIRAuth.auth()?.signIn(with: credentials, completion: {(user, error) in
+            if error != nil {
+                print(error?.localizedDescription ?? "error")
+                return
+            }})
+        print ("User logged it")
+    }
+    
+    func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
+        if let error = error{
+            print (error.localizedDescription)
+            return
+        }
+        try! FIRAuth.auth()!.signOut()
+    }
 }
 

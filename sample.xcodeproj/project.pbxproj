@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		2064FE591E4BB08400BFBF53 /* ChaperoneTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2064FE581E4BB08400BFBF53 /* ChaperoneTableViewController.swift */; };
+		D000530B1E4E5358004AE9AC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D000530A1E4E5358004AE9AC /* GoogleService-Info.plist */; };
+		D000530E1E4E5D17004AE9AC /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D000530D1E4E5D17004AE9AC /* SignInViewController.swift */; };
+		D00053101E4E5DC1004AE9AC /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D000530F1E4E5DC1004AE9AC /* HomeViewController.swift */; };
+		D00053151E4E6F7C004AE9AC /* Parent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D00053141E4E6F7C004AE9AC /* Parent.swift */; };
 		D01C723B1E481FE400E21BAB /* EditStudentTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C723A1E481FE400E21BAB /* EditStudentTableViewController.swift */; };
 		D01C723F1E48301500E21BAB /* debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C723E1E48301500E21BAB /* debug.swift */; };
 		D07190E11DCC42A700CDF595 /* StudentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07190E01DCC42A700CDF595 /* StudentTableViewCell.swift */; };
@@ -45,6 +49,11 @@
 		2064FE581E4BB08400BFBF53 /* ChaperoneTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChaperoneTableViewController.swift; sourceTree = "<group>"; };
 		2FD50E961D5EB43824A81CA5 /* Pods-sample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-sample.release.xcconfig"; path = "Pods/Target Support Files/Pods-sample/Pods-sample.release.xcconfig"; sourceTree = "<group>"; };
 		8A89C18B356D0459020FC955 /* Pods-sample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-sample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-sample/Pods-sample.debug.xcconfig"; sourceTree = "<group>"; };
+		D000530A1E4E5358004AE9AC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		D000530D1E4E5D17004AE9AC /* SignInViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
+		D000530F1E4E5DC1004AE9AC /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		D00053131E4E6339004AE9AC /* sample-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "sample-Bridging-Header.h"; sourceTree = "<group>"; };
+		D00053141E4E6F7C004AE9AC /* Parent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parent.swift; sourceTree = "<group>"; };
 		D01C723A1E481FE400E21BAB /* EditStudentTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditStudentTableViewController.swift; sourceTree = "<group>"; };
 		D01C723E1E48301500E21BAB /* debug.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = debug.swift; sourceTree = "<group>"; };
 		D07190E01DCC42A700CDF595 /* StudentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StudentTableViewCell.swift; sourceTree = "<group>"; };
@@ -134,6 +143,7 @@
 		D08A0AB71DC18F2500EECEA1 /* sample */ = {
 			isa = PBXGroup;
 			children = (
+				D000530A1E4E5358004AE9AC /* GoogleService-Info.plist */,
 				D08A0AB81DC18F2500EECEA1 /* AppDelegate.swift */,
 				D08A0ABC1DC18F2500EECEA1 /* Main.storyboard */,
 				D07190E21DCC46BD00CDF595 /* StudentTableViewController.swift */,
@@ -146,6 +156,10 @@
 				D01C723A1E481FE400E21BAB /* EditStudentTableViewController.swift */,
 				D01C723E1E48301500E21BAB /* debug.swift */,
 				2064FE581E4BB08400BFBF53 /* ChaperoneTableViewController.swift */,
+				D000530D1E4E5D17004AE9AC /* SignInViewController.swift */,
+				D000530F1E4E5DC1004AE9AC /* HomeViewController.swift */,
+				D00053131E4E6339004AE9AC /* sample-Bridging-Header.h */,
+				D00053141E4E6F7C004AE9AC /* Parent.swift */,
 			);
 			path = sample;
 			sourceTree = "<group>";
@@ -279,6 +293,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D08A0AC31DC18F2500EECEA1 /* LaunchScreen.storyboard in Resources */,
+				D000530B1E4E5358004AE9AC /* GoogleService-Info.plist in Resources */,
 				D08A0AC01DC18F2500EECEA1 /* Assets.xcassets in Resources */,
 				D08A0ABE1DC18F2500EECEA1 /* Main.storyboard in Resources */,
 			);
@@ -358,8 +373,11 @@
 				D01C723B1E481FE400E21BAB /* EditStudentTableViewController.swift in Sources */,
 				D08A0AB91DC18F2500EECEA1 /* AppDelegate.swift in Sources */,
 				D07190E31DCC46BD00CDF595 /* StudentTableViewController.swift in Sources */,
+				D00053101E4E5DC1004AE9AC /* HomeViewController.swift in Sources */,
+				D000530E1E4E5D17004AE9AC /* SignInViewController.swift in Sources */,
 				2064FE591E4BB08400BFBF53 /* ChaperoneTableViewController.swift in Sources */,
 				D07190E51DCC4B4D00CDF595 /* Student.swift in Sources */,
+				D00053151E4E6F7C004AE9AC /* Parent.swift in Sources */,
 				D07190E11DCC42A700CDF595 /* StudentTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -518,6 +536,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = seniordesign.sample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "sample/sample-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -531,6 +550,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = seniordesign.sample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "sample/sample-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;

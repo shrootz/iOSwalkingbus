@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="15G1217" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="DSY-3J-xfJ">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="68W-so-DSi">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -758,7 +758,7 @@
         <!--Navigation Controller-->
         <scene sceneID="5ze-SE-hXX">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="H3T-t2-6Bz" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="StudentTableNavController" automaticallyAdjustsScrollViewInsets="NO" id="H3T-t2-6Bz" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" systemItem="favorites" id="pL8-Ea-1S5"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="tJk-TA-aM3">
@@ -792,6 +792,34 @@
             </objects>
             <point key="canvasLocation" x="2431" y="546"/>
         </scene>
+        <!--Sign In View Controller-->
+        <scene sceneID="fsp-ii-Tt5">
+            <objects>
+                <viewController id="68W-so-DSi" customClass="SignInViewController" customModule="sample" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="1Mv-hp-181"/>
+                        <viewControllerLayoutGuide type="bottom" id="IC1-v7-7eq"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="q1V-Be-2Ne">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ycu-Yd-sQu" customClass="GIDSignInButton">
+                                <rect key="frame" x="67" y="229" width="240" height="128"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <segue destination="DSY-3J-xfJ" kind="show" identifier="home_screen" id="GUP-Qw-mQ4"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aOG-0z-XQb" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2377" y="127"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="Qp7-kr-cJI">
             <objects>
@@ -808,10 +836,10 @@
             </objects>
             <point key="canvasLocation" x="-1457" y="126"/>
         </scene>
-        <!--Walking Bus-->
+        <!--home_screen-->
         <scene sceneID="bNJ-OP-xHA">
             <objects>
-                <viewController id="kPk-Sj-PFJ" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="home_screen" title="home_screen" id="kPk-Sj-PFJ" customClass="HomeViewController" customModule="sample" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Fkv-bM-r2E"/>
                         <viewControllerLayoutGuide type="bottom" id="ya5-3o-5uj"/>
@@ -828,7 +856,7 @@
                                         <rect key="frame" x="0.0" y="0.0" width="76" height="30"/>
                                         <state key="normal" title="Parent"/>
                                         <connections>
-                                            <segue destination="H3T-t2-6Bz" kind="show" id="qNG-oC-lMb"/>
+                                            <segue destination="H3T-t2-6Bz" kind="show" identifier="EnterParent" id="qNG-oC-lMb"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aHV-pb-bfC">
@@ -854,7 +882,7 @@
         <image name="DefaultImage" width="320" height="320"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="iKl-NI-ygi"/>
         <segue reference="uEZ-P6-UyX"/>
+        <segue reference="iKl-NI-ygi"/>
     </inferredMetricsTieBreakers>
 </document>
