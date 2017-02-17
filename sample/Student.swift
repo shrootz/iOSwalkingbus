@@ -16,10 +16,11 @@ class Student {
     var photo: UIImage?
     var schedule_dictionary_coordinates: [String: [Double]]
     var schedule_dictionary_names: [String: String]
+    var database_pointer: String
     
     // MARK: Initialization
     
-    init?(name: String, photo: UIImage?, school: String, notes: String, schedule_dictionary_coordinates: [String: [Double]], schedule_dictionary_names: [String: String]) {
+    init?(name: String, photo: UIImage?, school: String, notes: String, schedule_dictionary_coordinates: [String: [Double]], schedule_dictionary_names: [String: String], database_pointer: String) {
         // Initialize stored properties.
         self.name = name
         self.photo = photo
@@ -27,6 +28,7 @@ class Student {
         self.notes = notes
         self.schedule_dictionary_coordinates = schedule_dictionary_coordinates
         self.schedule_dictionary_names = schedule_dictionary_names
+        self.database_pointer = database_pointer
         if name.isEmpty {
             return nil
         }

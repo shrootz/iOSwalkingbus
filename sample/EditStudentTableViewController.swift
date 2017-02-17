@@ -8,6 +8,7 @@
 
 import UIKit
 import os.log
+import Firebase
 
 class EditStudentTableViewController: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     @IBOutlet weak var student_image: UIImageView!
@@ -28,9 +29,13 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     @IBOutlet weak var friday_pm: UIButton!
     
     
+    
     var student: Student?
     var coordinates : [String:[Double]] = [:]
     var names : [String:String] = [:]
+    var ref: FIRDatabaseReference?
+    var parent_auth_id: String?
+    var student_pointer: String?
     
     @IBAction func browseForImage(_ sender: UIButton) {
         // Hide the keyboard.
@@ -51,13 +56,13 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     @IBAction func cancel(_ sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
         /*let isPresentingInAddStudentMode = presentingViewController is UINavigationController
-        
-        if isPresentingInAddStudentMode {
-            dismiss(animated: true, completion: nil)
-        }
-        else {
-            navigationController!.popViewController(animated: true)
-        }*/
+         
+         if isPresentingInAddStudentMode {
+         dismiss(animated: true, completion: nil)
+         }
+         else {
+         navigationController!.popViewController(animated: true)
+         }*/
     }
     
     // MARK: UIImagePickerControllerDelegate
@@ -87,6 +92,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             school_name.text = student.school
             student_notes.text = student.notes
             student_image.image = student.photo
+            student_pointer = student.database_pointer
             coordinates = student.schedule_dictionary_coordinates
             names = student.schedule_dictionary_names
             if let val = student.schedule_dictionary_names["monday_am"] {
@@ -131,14 +137,14 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         }
         
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
     // MARK: - Navigation
-
+    
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
@@ -149,16 +155,45 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             let school = school_name.text ?? ""
             let notes = student_notes.text ?? ""
             let photo = student_image.image
-            student = Student(name: name, photo: photo, school: school, notes: notes, schedule_dictionary_coordinates: coordinates, schedule_dictionary_names: names)
+            
+            if(student_pointer == nil){
+                let new_child = self.ref?.child("/children/").childByAutoId()
+                let parents_children = "parents/" +  self.parent_auth_id! + "/children"
+                self.ref?.child(parents_children).childByAutoId().setValue((new_child?.key)!)
+                let parentarray: [String: String] =  [self.parent_auth_id! : "1"]
+                
+                new_child?.setValue([
+                    "name": name,
+                    "school": school,
+                    "notes": notes,
+                    "bluetooth":"11:11:11:11:11:11",
+                    "status":"lost",
+                    "parents":parentarray
+                    ])
+                student = Student(name: name, photo: photo, school: school, notes: notes, schedule_dictionary_coordinates: coordinates, schedule_dictionary_names: names, database_pointer: (new_child?.key)!)
+            }
+            else{
+                let existing_child = self.ref?.child("/children/").child(student_pointer!)
+                let parentarray: [String: String] =  [self.parent_auth_id! : "1"]
+                existing_child?.setValue([
+                    "name": name,
+                    "school": school,
+                    "notes": notes,
+                    "bluetooth":"11:11:11:11:11:11",
+                    "status":"lost",
+                    "parents":parentarray
+                    ])
+                student = Student(name: name, photo: photo, school: school, notes: notes, schedule_dictionary_coordinates: coordinates, schedule_dictionary_names: names, database_pointer:student_pointer!)
+            }
         }
-        
+            
         else if sender as AnyObject? === monday_am {
             let mapViewController = segue.destination as! MapViewController
             if let val = coordinates["monday_am"]{
                 mapViewController.latitude = val[0]
                 mapViewController.longitude = val[1]
             }
-
+            
         }
         else if sender as AnyObject? === monday_pm {
             let mapViewController = segue.destination as! MapViewController
@@ -227,18 +262,18 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         }
     }
     
-
+    
     //MARK: UITextFieldDelegate
     func textFieldShouldReturn(_ textField: UITextField) -> Bool{
         // Hide the keyboard.
         textField.resignFirstResponder()
         return true
     }
-
+    
     func textFieldDidEndEditing(_ textField: UITextField){
         navigationItem.title = textField.text
     }
-
+    
     // MARK: - Table view data source
     /*
      override func numberOfSections(in tableView: UITableView) -> Int {

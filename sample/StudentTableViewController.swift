@@ -14,16 +14,14 @@ class StudentTableViewController: UITableViewController {
     var students = [Student]()
     var ref: FIRDatabaseReference?
     var parent_location: String?
-
+    var parent_auth_id: String?
+    
     
     func loadStudents() {
-        print("HI BISH")
         let photo1 = UIImage(named: "DefaultImage")!
         let coordinates_empty : [String:[Double]] = [:]
         let names_empty : [String:String] = [:]
-        
-     //   var resultArray:[String] = []
-     //   var students_array:[Student] = []
+        print("HI BISH")
         
         ref?.child(parent_location!).child("children").observeSingleEvent(of: .value, with: { (snapshot) in
             for item in snapshot.children {
@@ -31,9 +29,11 @@ class StudentTableViewController: UITableViewController {
                 print(val)
                 self.ref?.child("/children/").child(val).observeSingleEvent(of: .value, with: { (snapshot2) in
                     print("GET")
-                    let student_name = snapshot2.value(forKey: "name") as! String
-                    let student_notes = snapshot2.value(forKey: "bluetooth") as! String
-                    let student1 = Student(name: student_name, photo: photo1, school:"", notes:student_notes, schedule_dictionary_coordinates:coordinates_empty, schedule_dictionary_names:names_empty)!
+                    print(snapshot2)
+                    let student_name = snapshot2.childSnapshot(forPath: "name").value as? String
+                    let student_notes = snapshot2.childSnapshot(forPath: "notes").value as? String
+                    let student_school = snapshot2.childSnapshot(forPath: "school").value as? String
+                    let student1 = Student(name: student_name!, photo: photo1, school:student_school!, notes:student_notes!, schedule_dictionary_coordinates:coordinates_empty, schedule_dictionary_names:names_empty, database_pointer:val)!
                     self.students += [student1]
                     print("size of students\(self.students.count)")
                     DispatchQueue.main.async{
@@ -42,27 +42,7 @@ class StudentTableViewController: UITableViewController {
                 })
             }
         })
-        
-       // print("Results Array: \(resultArray)")
-       // print("Results Array Count: \(resultArray.count)")
-        
-        /*ref?.child(parent_location!).child("children").observeSingleEvent(of: .value, with: { snapshot in
-                //let val = snapshot.children.allObjects
-                //print(snapshot.children.allObjects.value as String)
-                for item in snapshot.children.allObjects{
-                    let current_key = (item as AnyObject).key as String
-                    let val = (item as AnyObject).value as String
-                    print(val)
-
-                } */
-                //print("Results Array: \(resultArray)")
-                //print("Results Array Count: \(resultArray.count)")
-            
-          //  })
-        
-    //    ref?.child(parent_location!).child("children").observe(.value, with: { snapshot in
-      //      print(snapshot.value)
-      //  })
+        print("OUT BISH")
     }
     
     func loadSampleStudents() {
@@ -83,17 +63,17 @@ class StudentTableViewController: UITableViewController {
             "thursday_am" : "Australia",
             "friday_am" : "India"
         ]
-        let student1 = Student(name: "Bob", photo: photo1, school:"", notes:"", schedule_dictionary_coordinates:coordinates, schedule_dictionary_names: names)!
+        let student1 = Student(name: "Bob", photo: photo1, school:"", notes:"", schedule_dictionary_coordinates:coordinates, schedule_dictionary_names: names,database_pointer:"")!
         
         let coordinates_empty : [String:[Double]] = [:]
         
         let names_empty : [String:String] = [:]
-
+        
         let photo2 = UIImage(named: "DefaultImage")!
-        let student2 = Student(name: "Sally", photo: photo2, school:"", notes:"", schedule_dictionary_coordinates:coordinates_empty, schedule_dictionary_names:names_empty)!
+        let student2 = Student(name: "Sally", photo: photo2, school:"", notes:"", schedule_dictionary_coordinates:coordinates_empty, schedule_dictionary_names:names_empty, database_pointer:"")!
         
         let photo3 = UIImage(named: "DefaultImage")!
-        let student3 = Student(name: "Tom", photo: photo3, school:"", notes:"", schedule_dictionary_coordinates:coordinates_empty, schedule_dictionary_names:names_empty)!
+        let student3 = Student(name: "Tom", photo: photo3, school:"", notes:"", schedule_dictionary_coordinates:coordinates_empty, schedule_dictionary_names:names_empty, database_pointer:"")!
         
         students += [student1, student2, student3]
     }
@@ -101,40 +81,31 @@ class StudentTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-       let beeb = self.ref?.child("/children/").childByAutoId()
-        beeb?.setValue(["name": "bob", "bluetooth":"11:11:11:11:11:11", "status":"lost", "parent":"seFA6JsWxJhJsYSCeVtoGgZmwNz2"])
-        let parents_children = parent_location! + "/children"
-        self.ref?.child(parents_children).childByAutoId().setValue((beeb?.key)!)
-    
-        
-        loadSampleStudents()
+        //loadSampleStudents()
         loadStudents()
         
-        
-
-
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
-
+        
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
     // MARK: - Table view data source
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-         return students.count
+        return students.count
     }
-
+    
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cellIdentifier = "StudentTableViewCell"
@@ -173,7 +144,7 @@ class StudentTableViewController: UITableViewController {
         return true
     }
     
-
+    
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
@@ -182,27 +153,27 @@ class StudentTableViewController: UITableViewController {
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
-
+    
     /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
+     // Override to support rearranging the table view.
+     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+     
+     }
+     */
+    
     /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-
+     // Override to support conditional rearranging of the table view.
+     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+     // Return false if you do not want the item to be re-orderable.
+     return true
+     }
+     */
+    
+    
     // MARK: - Navigation
-
+    
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowDetail" {
@@ -213,13 +184,19 @@ class StudentTableViewController: UITableViewController {
                 let indexPath = tableView.indexPath(for: selectedStudentCell)!
                 let selectedStudent = students[indexPath.row]
                 studentDetailViewController.student = selectedStudent
+                studentDetailViewController.ref = self.ref
+                studentDetailViewController.parent_auth_id = self.parent_auth_id
             }
         }
         else if segue.identifier == "AddItem" {
             print("Adding new student.")
+            let studentDetailNavController = segue.destination as! UINavigationController
+            let studentDetailViewController = studentDetailNavController.topViewController as! EditStudentTableViewController
+            studentDetailViewController.ref = self.ref
+            studentDetailViewController.parent_auth_id = self.parent_auth_id
         }
     }
-
+    
     @IBAction func goHome(_ sender: UIBarButtonItem) {
         // Depending on style of presentation (modal or push presentation), this view controller needs to be dismissed in two different ways.
         let isPresentingInAddStudentMode = presentingViewController is UINavigationController
