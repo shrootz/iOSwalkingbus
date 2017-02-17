@@ -18,7 +18,7 @@ class StudentTableViewController: UITableViewController {
     
     
     func loadStudents() {
-        let photo1 = UIImage(named: "DefaultImage")!
+        var photo1 = UIImage(named: "DefaultImage")!
         let coordinates_empty : [String:[Double]] = [:]
         let names_empty : [String:String] = [:]
         print("HI BISH")
@@ -33,6 +33,35 @@ class StudentTableViewController: UITableViewController {
                     let student_name = snapshot2.childSnapshot(forPath: "name").value as? String
                     let student_notes = snapshot2.childSnapshot(forPath: "notes").value as? String
                     let student_school = snapshot2.childSnapshot(forPath: "school").value as? String
+                    if snapshot2.hasChild("photoUrl"){
+                  /*      // set image locatin
+                        // Assuming a < 10MB file, though you can change that
+                        if let url = NSURL(string: (snapshot2.childSnapshot(forPath: "photoUrl").value as? String)!) {
+                            if let data = NSData(contentsOf: url as URL){
+                                if let imageUrl = UIImage(data: data as Data) {
+                                    photo1 = imageUrl  // you can use your imageUrl UIImage (note: imageUrl it is not an optional here)
+                                }
+                            }
+                        }
+                        */
+                        let filePath = "\(val)/\("photoUrl")"
+                        print("i have some image \(filePath)/")
+                        FIRStorage.storage().reference().child(filePath).data(withMaxSize: 10*1024*1024, completion: { (data, error) in
+                            print("storing the image")
+                            if let imageUrl = UIImage(data: data!) {
+                                photo1 = imageUrl  // you can use your imageUrl UIImage (note: imageUrl it is not an optional here)
+                                for student in self.students {
+                                    if student.database_pointer == val{
+                                        student.setImage(photo: photo1)
+                                        DispatchQueue.main.async{
+                                            self.tableView.reloadData()
+                                        }
+                                    }
+                                    
+                                }
+                            }
+                        })
+                    }
                     let student1 = Student(name: student_name!, photo: photo1, school:student_school!, notes:student_notes!, schedule_dictionary_coordinates:coordinates_empty, schedule_dictionary_names:names_empty, database_pointer:val)!
                     self.students += [student1]
                     print("size of students\(self.students.count)")

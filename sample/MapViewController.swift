@@ -8,11 +8,14 @@
 
 import UIKit
 import GoogleMaps
+import Firebase
 
 class MapViewController: UIViewController {
     
-    var longitude:Double = 0.0
-    var latitude:Double = 0.0
+    var longitude:Double = -97.7431
+    var latitude:Double = 30.2672
+    var school_database_reference:String?
+    var ref:FIRDatabaseReference?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,18 +32,64 @@ class MapViewController: UIViewController {
     override func loadView() {
         // Create a GMSCameraPosition that tells the map to display the
         // coordinate -33.86,151.20 at zoom level 6.
-        let camera = GMSCameraPosition.camera(withLatitude: latitude, longitude: longitude, zoom: 15.0)
+        let camera = GMSCameraPosition.camera(withLatitude: self.latitude, longitude: self.longitude, zoom: 6.0)
         let mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
-        view = mapView
+        self.view = mapView
+        ref = FIRDatabase.database().reference()
         
-        // Creates a marker in the center of the map.
-        let marker = GMSMarker()
-        marker.position = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        //marker.title = "Sydney"
-        //marker.snippet = "Australia"
-        marker.map = mapView
-        //marker.icon = GMSMarker.markerImage(with: .black)
+        ref?.child(school_database_reference!).observeSingleEvent(of: .value, with: {(snap) in
+            print("reading school coordinates")
+            if snap.exists(){
+                    self.longitude = (snap.childSnapshot(forPath: "latitude").value as? Double)!
+                    self.latitude = (snap.childSnapshot(forPath: "longitude").value as? Double)!
+            }else{
+                print("incorrect school")
+            }
+            print("in edit \(self.longitude)")
+            print("in edit \(self.latitude)")
+            
+            DispatchQueue.main.async() {
+                // update some UI
+                let marker = GMSMarker()
+                marker.position = CLLocationCoordinate2D(latitude: self.latitude, longitude: self.longitude)
+                //marker.map = (self.view as! GMSMapView)
+                CATransaction.begin()
+                CATransaction.setValue(2.0, forKey: kCATransactionAnimationDuration)
+                let newcamera = GMSCameraPosition.camera(withLatitude: self.latitude, longitude: self.longitude, zoom: 15.0)
+                (self.view as! GMSMapView).animate(to: newcamera)
+                //let newCam = GMSCameraUpdate.setTarget(marker.position)
+                //(self.view as! GMSMapView).moveCamera(newCam)
+                marker.map = (self.view as! GMSMapView)
+                marker.icon = GMSMarker.markerImage(with: .green)
+                CATransaction.commit()
+
+            }
+            
+            //let newcamera = GMSCameraPosition.camera(withLatitude: self.latitude, longitude: self.longitude, zoom: 6.0)
+            
+            //(self.view as! GMSMapView).animate(to: newcamera)
+            //let newCam = GMSCameraUpdate.setTarget(marker.position)
+            //mapView.animate(with: newCam)
+            //marker.icon = GMSMarker.markerImage(with: .black)
+        })
+        
+        
+        
+        
+        
+        /*serialQueue.sync {
+            print("in task2 \(self.longitude)")
+            print("in task2 \(self.latitude)")
+            let camera = GMSCameraPosition.camera(withLatitude: self.latitude, longitude: self.longitude, zoom: 6.0)
+            let mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
+            self.view = mapView
+            let marker = GMSMarker()
+            marker.position = CLLocationCoordinate2D(latitude: self.latitude, longitude: self.longitude)
+            marker.map = mapView
+
+        } */
     }
+}
     
     /*
      // MARK: - Navigation
@@ -51,5 +100,3 @@ class MapViewController: UIViewController {
      // Pass the selected object to the new view controller.
      }
      */
-    
-}

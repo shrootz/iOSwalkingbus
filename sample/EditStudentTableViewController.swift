@@ -158,8 +158,10 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             
             if(student_pointer == nil){
                 let new_child = self.ref?.child("/children/").childByAutoId()
+                let child_id = new_child?.key as String!
+                print(child_id)
                 let parents_children = "parents/" +  self.parent_auth_id! + "/children"
-                self.ref?.child(parents_children).childByAutoId().setValue((new_child?.key)!)
+                self.ref?.child(parents_children).childByAutoId().setValue(child_id!)
                 let parentarray: [String: String] =  [self.parent_auth_id! : "1"]
                 
                 new_child?.setValue([
@@ -170,6 +172,24 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                     "status":"lost",
                     "parents":parentarray
                     ])
+
+                    var data = Data()
+                    data = UIImageJPEGRepresentation(photo!, 0)!
+                    // set upload path
+                    let filePath = "\(child_id!)/\("photoUrl")"
+                    let metaData = FIRStorageMetadata()
+                    metaData.contentType = "image/jpg"
+                    FIRStorage.storage().reference().child(filePath).put(data, metadata: metaData){(metaData,error) in
+                        if let error = error {
+                            print(error.localizedDescription)
+                            return
+                        }else{
+                            //store downloadURL
+                            let downloadURL = metaData!.downloadURL()!.absoluteString
+                            //store downloadURL at database
+                            new_child?.updateChildValues(["photoUrl": downloadURL])
+                        }
+                    }
                 student = Student(name: name, photo: photo, school: school, notes: notes, schedule_dictionary_coordinates: coordinates, schedule_dictionary_names: names, database_pointer: (new_child?.key)!)
             }
             else{
@@ -183,18 +203,42 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                     "status":"lost",
                     "parents":parentarray
                     ])
+                var data = Data()
+                data = UIImageJPEGRepresentation(photo!, 0)!
+                // set upload path
+                let filePath = "\(student_pointer!)/\("photoUrl")"
+                let metaData = FIRStorageMetadata()
+                metaData.contentType = "image/jpg"
+                FIRStorage.storage().reference().child(filePath).put(data, metadata: metaData){(metaData,error) in
+                    if let error = error {
+                        print(error.localizedDescription)
+                        return
+                    }else{
+                        //store downloadURL
+                        let downloadURL = metaData!.downloadURL()!.absoluteString
+                        //store downloadURL at database
+                        existing_child?.updateChildValues(["photoUrl": downloadURL])
+                    }
+                }
                 student = Student(name: name, photo: photo, school: school, notes: notes, schedule_dictionary_coordinates: coordinates, schedule_dictionary_names: names, database_pointer:student_pointer!)
             }
         }
             
         else if sender as AnyObject? === monday_am {
             let mapViewController = segue.destination as! MapViewController
+            print("\(school_name.text!)")
+            mapViewController.school_database_reference = "schools/" + school_name.text!
+        }
+        
+        /*
+         if sender as AnyObject? === monday_am {
+            let mapViewController = segue.destination as! MapViewController
             if let val = coordinates["monday_am"]{
                 mapViewController.latitude = val[0]
                 mapViewController.longitude = val[1]
             }
-            
-        }
+         }
+         
         else if sender as AnyObject? === monday_pm {
             let mapViewController = segue.destination as! MapViewController
             if let val = coordinates["monday_pm"]{
@@ -209,7 +253,6 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                 mapViewController.latitude = val[0]
                 mapViewController.longitude = val[1]
             }
-            
         }
         else if sender as AnyObject? === tuesday_pm {
             let mapViewController = segue.destination as! MapViewController
@@ -260,6 +303,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                 mapViewController.longitude = val[1]
             }
         }
+        */
     }
     
     

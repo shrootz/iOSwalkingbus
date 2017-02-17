@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="68W-so-DSi">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="68W-so-DSi">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -848,38 +848,57 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="71S-bo-OQO">
-                                <rect key="frame" x="149" y="90" width="76" height="60"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="AiU-Kd-3P6">
+                                <rect key="frame" x="124" y="293" width="126" height="80"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zTi-wq-oRe">
-                                        <rect key="frame" x="0.0" y="0.0" width="76" height="30"/>
-                                        <state key="normal" title="Parent"/>
-                                        <connections>
-                                            <segue destination="H3T-t2-6Bz" kind="show" identifier="EnterParent" id="qNG-oC-lMb"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aHV-pb-bfC">
-                                        <rect key="frame" x="0.0" y="30" width="76" height="30"/>
-                                        <state key="normal" title="Chaperone"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aHV-pb-bfC">
+                                        <rect key="frame" x="0.0" y="0.0" width="126" height="30"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <state key="normal" title="Chaperone Sign In"/>
                                         <connections>
                                             <segue destination="lgL-Lg-1pG" kind="show" id="v7Q-qH-iK3"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zTi-wq-oRe">
+                                        <rect key="frame" x="0.0" y="50" width="126" height="30"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <state key="normal" title="Parent Sign In"/>
+                                        <connections>
+                                            <segue destination="H3T-t2-6Bz" kind="show" identifier="EnterParent" id="qNG-oC-lMb"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
+                                <constraints>
+                                    <constraint firstItem="zTi-wq-oRe" firstAttribute="top" secondItem="aHV-pb-bfC" secondAttribute="bottom" constant="20" id="cBa-d4-PmW"/>
+                                </constraints>
                             </stackView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="Screen Shot 2017-02-17 at 5.02.31 AM" translatesAutoresizingMaskIntoConstraints="NO" id="QLN-ip-wvf">
+                                <rect key="frame" x="90" y="441" width="195" height="108"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="QLN-ip-wvf" secondAttribute="height" multiplier="65:36" id="uFJ-t7-fEf"/>
+                                </constraints>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="QLN-ip-wvf" firstAttribute="centerX" secondItem="POF-lV-HQh" secondAttribute="centerX" id="adi-go-9o9"/>
+                            <constraint firstItem="AiU-Kd-3P6" firstAttribute="centerX" secondItem="POF-lV-HQh" secondAttribute="centerX" id="i48-4q-MJA"/>
+                            <constraint firstItem="QLN-ip-wvf" firstAttribute="centerY" secondItem="POF-lV-HQh" secondAttribute="centerY" constant="150" id="lLl-d9-6mH"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="QLN-ip-wvf" secondAttribute="trailing" constant="10" id="qKH-Je-RZD"/>
+                            <constraint firstItem="QLN-ip-wvf" firstAttribute="leading" secondItem="POF-lV-HQh" secondAttribute="leadingMargin" constant="10" id="r9T-pT-cWE"/>
+                            <constraint firstItem="AiU-Kd-3P6" firstAttribute="centerY" secondItem="POF-lV-HQh" secondAttribute="centerY" id="ukq-gh-CkC"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Walking Bus" id="Bgr-Ik-X9m"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oq4-wF-fPU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-550" y="127"/>
+            <point key="canvasLocation" x="-551.20000000000005" y="126.38680659670166"/>
         </scene>
     </scenes>
     <resources>
         <image name="DefaultImage" width="320" height="320"/>
+        <image name="Screen Shot 2017-02-17 at 5.02.31 AM" width="334" height="228"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="uEZ-P6-UyX"/>

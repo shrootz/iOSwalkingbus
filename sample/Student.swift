@@ -33,4 +33,8 @@ class Student {
             return nil
         }
     }
+    
+    func setImage(photo: UIImage) {
+        self.photo = photo
+    }
 }
