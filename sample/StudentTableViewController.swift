@@ -21,31 +21,20 @@ class StudentTableViewController: UITableViewController {
         var photo1 = UIImage(named: "DefaultImage")!
         let coordinates_empty : [String:[Double]] = [:]
         let names_empty : [String:String] = [:]
-        print("HI BISH")
+        print("Loading Students...")
         
-        ref?.child(parent_location!).child("children").observeSingleEvent(of: .value, with: { (snapshot) in
+        ref?.child(parent_location!).child("students").observeSingleEvent(of: .value, with: { (snapshot) in
             for item in snapshot.children {
                 let val = (item as AnyObject).value as String
                 print(val)
-                self.ref?.child("/children/").child(val).observeSingleEvent(of: .value, with: { (snapshot2) in
+                self.ref?.child("/students/").child(val).observeSingleEvent(of: .value, with: { (snapshot2) in
                     print("GET")
                     print(snapshot2)
                     let student_name = snapshot2.childSnapshot(forPath: "name").value as? String
-                    let student_notes = snapshot2.childSnapshot(forPath: "notes").value as? String
+                    let student_notes = snapshot2.childSnapshot(forPath: "info").value as? String
                     let student_school = snapshot2.childSnapshot(forPath: "school").value as? String
                     if snapshot2.hasChild("photoUrl"){
-                  /*      // set image locatin
-                        // Assuming a < 10MB file, though you can change that
-                        if let url = NSURL(string: (snapshot2.childSnapshot(forPath: "photoUrl").value as? String)!) {
-                            if let data = NSData(contentsOf: url as URL){
-                                if let imageUrl = UIImage(data: data as Data) {
-                                    photo1 = imageUrl  // you can use your imageUrl UIImage (note: imageUrl it is not an optional here)
-                                }
-                            }
-                        }
-                        */
                         let filePath = "\(val)/\("photoUrl")"
-                        print("i have some image \(filePath)/")
                         FIRStorage.storage().reference().child(filePath).data(withMaxSize: 10*1024*1024, completion: { (data, error) in
                             print("storing the image")
                             if let imageUrl = UIImage(data: data!) {
@@ -71,7 +60,6 @@ class StudentTableViewController: UITableViewController {
                 })
             }
         })
-        print("OUT BISH")
     }
     
     func loadSampleStudents() {
@@ -110,14 +98,8 @@ class StudentTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //loadSampleStudents()
         loadStudents()
         
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-        
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
     
     override func didReceiveMemoryWarning() {

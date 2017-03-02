@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2064D8DE1E677B0300D5B268 /* EditUserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2064D8DD1E677B0300D5B268 /* EditUserViewController.swift */; };
 		2064FE591E4BB08400BFBF53 /* ChaperoneTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2064FE581E4BB08400BFBF53 /* ChaperoneTableViewController.swift */; };
 		D000530B1E4E5358004AE9AC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D000530A1E4E5358004AE9AC /* GoogleService-Info.plist */; };
 		D000530E1E4E5D17004AE9AC /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D000530D1E4E5D17004AE9AC /* SignInViewController.swift */; };
@@ -46,6 +47,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2064D8DD1E677B0300D5B268 /* EditUserViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditUserViewController.swift; sourceTree = "<group>"; };
 		2064FE581E4BB08400BFBF53 /* ChaperoneTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChaperoneTableViewController.swift; sourceTree = "<group>"; };
 		2FD50E961D5EB43824A81CA5 /* Pods-sample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-sample.release.xcconfig"; path = "Pods/Target Support Files/Pods-sample/Pods-sample.release.xcconfig"; sourceTree = "<group>"; };
 		8A89C18B356D0459020FC955 /* Pods-sample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-sample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-sample/Pods-sample.debug.xcconfig"; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 				D000530F1E4E5DC1004AE9AC /* HomeViewController.swift */,
 				D00053131E4E6339004AE9AC /* sample-Bridging-Header.h */,
 				D00053141E4E6F7C004AE9AC /* Parent.swift */,
+				2064D8DD1E677B0300D5B268 /* EditUserViewController.swift */,
 			);
 			path = sample;
 			sourceTree = "<group>";
@@ -371,6 +374,7 @@
 				D07C356B1E3950B6006415E7 /* MapViewController.swift in Sources */,
 				D01C723F1E48301500E21BAB /* debug.swift in Sources */,
 				D01C723B1E481FE400E21BAB /* EditStudentTableViewController.swift in Sources */,
+				2064D8DE1E677B0300D5B268 /* EditUserViewController.swift in Sources */,
 				D08A0AB91DC18F2500EECEA1 /* AppDelegate.swift in Sources */,
 				D07190E31DCC46BD00CDF595 /* StudentTableViewController.swift in Sources */,
 				D00053101E4E5DC1004AE9AC /* HomeViewController.swift in Sources */,

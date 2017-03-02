@@ -15,119 +15,49 @@ class HomeViewController: UIViewController {
     var ref: FIRDatabaseReference!
     var parent_location: String!
     var parent_auth_id: String!
+    var userName = ""
+    var email = ""
+    var photoUrl = ""
+    var phoneNumber = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
         ref = FIRDatabase.database().reference()
-        // let serialQueue = DispatchQueue(label: "dumbass")
-        var userID = ""
-        var userName = ""
         
-        FIRDatabase.database().reference().child("parents/\(FIRAuth.auth()!.currentUser!.uid)/").observeSingleEvent(of: .value, with: {(snap) in
+        FIRDatabase.database().reference().child("users/\(FIRAuth.auth()!.currentUser!.uid)/").observeSingleEvent(of: .value, with: {(snap) in
             self.parent_auth_id = (FIRAuth.auth()?.currentUser?.uid)!
-            userName = (FIRAuth.auth()?.currentUser?.displayName)!
-            self.parent_location = String(format: "parents/%@/", self.parent_auth_id)
+            self.userName = (FIRAuth.auth()?.currentUser?.displayName) as String!
+            self.email = FIRAuth.auth()?.currentUser?.email as String!
+            self.photoUrl = FIRAuth.auth()?.currentUser?.photoURL?.absoluteString as String!
+            self.parent_location = String(format: "users/%@/", self.parent_auth_id)
             print (self.parent_location)
             if snap.exists(){
-                //Your user already has a username
-                print("i fucking exist in this goddamn database")
+                self.userName = (snap.childSnapshot(forPath: "displayName").value as? String)!
+                self.email = (snap.childSnapshot(forPath: "email").value as? String)!
+                self.photoUrl = (snap.childSnapshot(forPath: "photoUrl").value as? String)!
+                self.phoneNumber = (snap.childSnapshot(forPath: "phone").value as? String)!
+                
+                print("User was found in database. Loading...")
             }else{
-                //You need to set the user's name and the the required segue
-                print("need to add")
-                self.ref.child(self.parent_location).child("name").setValue(userName as String!)
+                print("Adding User to Database...")
+                self.ref.child(self.parent_location).setValue([
+                    "displayName": self.userName,
+                    "email": self.email,
+                    "photoUrl": self.photoUrl,
+                    "phone": self.phoneNumber
+                    ])
             }
         })
         
-        /*
-         serialQueue.sync {
-         print("gfdi")
-         //let query = FIRDatabase.database().reference(withPath: "parents/").queryEqual(toValue: userID, childKey: userName)
-         //print(query)
-         self.ref.child("/parents").observeSingleEvent(of: .value, with: { (snapshot) in
-         print("help")
-         if snapshot.hasChild(userID as String!){
-         print("i already found myself in the database")
-         } else{
-         self.ref.child(self.parent_location).setValue(userName as String!)
-         print("added myself to the database")
-         }
-         })
-         }
-         
-         serialQueue.sync {
-         FIRAuth.auth()!.addStateDidChangeListener { auth, user in
-         guard user != nil else { return }
-         userID = (FIRAuth.auth()?.currentUser?.uid)!
-         userName = (FIRAuth.auth()?.currentUser?.displayName)!
-         self.parent_location = String(format: "parents/%@/", userID)
-         print (self.parent_location)
-         }
-         }
-         */
-        /*let firstGroup = DispatchGroup.init()
-         var userID = ""
-         var userName = ""
-         
-         firstGroup.enter()
-         FIRAuth.auth()!.addStateDidChangeListener { auth, user in
-         guard user != nil else { return }
-         userID = (FIRAuth.auth()?.currentUser?.uid)!
-         userName = (FIRAuth.auth()?.currentUser?.displayName)!
-         self.parent_location = String(format: "parents/%@/", userID)
-         print (self.parent_location)
-         
-         }
-         
-         firstGroup.leave()
-         firstGroup.notify(queue: DispatchQueue.main, execute: {
-         let secondGroup = DispatchGroup.init()
-         secondGroup.enter()
-         print("enters the first group notification")
-         self.ref.child("parents/").observeSingleEvent(of: .value, with: { (snapshot) in
-         print("help")
-         if snapshot.hasChild(userID as String!){
-         print("i already found myself in the database")
-         } else{
-         self.ref.child(self.parent_location).setValue(userName as String!)
-         print("added myself to the database")
-         }
-         })
-         secondGroup.leave()
-         secondGroup.notify(queue: DispatchQueue.main) {
-         print("All the loading is fin")
-         }
-         } ) */
         
         
     }
-    
-    /*
-     let ref = FIRDatabase.database().reference(withPath: "parents/").queryEqual(toValue: userID, childKey: userName)
-     ref.observeSingleEvent(of: .childAdded, with: { snapshot in
-     print(snapshot)
-     })
-     }
-     */
-    
-    /*self.ref?.child("parents/").observeSingleEvent(of: .value, with: { (snapshot) in
-     for item in snapshot.children {
-     let val = (item as AnyObject).value as String
-     if(val == userID){
-     print("i already found myself in the database")
-     return;
-     }
-     }
-     print("added myself to the database")
-     })
-     */
     
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    
     
     // MARK: - Navigation
     
@@ -139,6 +69,16 @@ class HomeViewController: UIViewController {
             studentViewController.ref = ref
             studentViewController.parent_location = parent_location
             studentViewController.parent_auth_id = parent_auth_id
+        } else if segue.identifier == "editUser" {
+            let editUserViewController = segue.destination as! EditUserViewController
+            editUserViewController.ref = ref
+            editUserViewController.parent_location = parent_location
+            editUserViewController.parent_auth_id = parent_auth_id
+            editUserViewController.name = userName
+            editUserViewController.email = email
+            editUserViewController.photoUrl = photoUrl
+            print(self.photoUrl)
+            editUserViewController.phone = phoneNumber
         }
     }
     

@@ -10,13 +10,15 @@ import UIKit
 import os.log
 import Firebase
 
-class EditStudentTableViewController: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class EditStudentTableViewController: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDataSource,UIPickerViewDelegate {
+    
+
     @IBOutlet weak var student_image: UIImageView!
     @IBOutlet weak var full_name: UITextField!
-    @IBOutlet weak var school_name: UITextField!
     @IBOutlet weak var student_notes: UITextField!
     @IBOutlet weak var saveButton: UIBarButtonItem!
     
+    @IBOutlet weak var schoolPicker: UIPickerView!
     @IBOutlet weak var monday_am: UIButton!
     @IBOutlet weak var monday_pm: UIButton!
     @IBOutlet weak var tuesday_am: UIButton!
@@ -36,6 +38,9 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     var ref: FIRDatabaseReference?
     var parent_auth_id: String?
     var student_pointer: String?
+    var schools : [String:String] = [:]
+    var schools_list:[String] = []
+    var valueSelected = ""
     
     @IBAction func browseForImage(_ sender: UIButton) {
         // Hide the keyboard.
@@ -82,14 +87,36 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         
     }
     
+    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    @available(iOS 2.0, *)
+    public func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return schools.count
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Handle the text field’s user input through delegate callbacks.
+        schools_list.append("")
+        FIRDatabase.database().reference().child("/users/").child(parent_auth_id!).child("schools_parent").observeSingleEvent(of: .value, with: {(snap) in if snap.exists(){
+            print("cries")
+            for item in snap.children.allObjects {
+                self.schools[(item as AnyObject).value] = (item as AnyObject).key
+                self.schools_list.append((item as AnyObject).value)
+            }
+            }
+        })
+        schoolPicker.dataSource = self
+        schoolPicker.delegate = self
         full_name.delegate = self
+        
         if let student = student {
             navigationItem.title = student.name
             full_name.text   = student.name
-            school_name.text = student.school
             student_notes.text = student.notes
             student_image.image = student.photo
             student_pointer = student.database_pointer
@@ -143,6 +170,11 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         // Dispose of any resources that can be recreated.
     }
     
+    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return schools_list[row]
+    }
+    
+    
     // MARK: - Navigation
     
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -152,15 +184,14 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         if sender as AnyObject? === saveButton {
             print("save button tapped for the prepare")
             let name = full_name.text ?? ""
-            let school = school_name.text ?? ""
+            let school = valueSelected 
             let notes = student_notes.text ?? ""
             let photo = student_image.image
             
             if(student_pointer == nil){
-                let new_child = self.ref?.child("/children/").childByAutoId()
+                let new_child = self.ref?.child("/students/").childByAutoId()
                 let child_id = new_child?.key as String!
-                print(child_id)
-                let parents_children = "parents/" +  self.parent_auth_id! + "/children"
+                let parents_children = "users/" +  self.parent_auth_id! + "/students"
                 self.ref?.child(parents_children).childByAutoId().setValue(child_id!)
                 let parentarray: [String: String] =  [self.parent_auth_id! : "1"]
                 
@@ -193,7 +224,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                 student = Student(name: name, photo: photo, school: school, notes: notes, schedule_dictionary_coordinates: coordinates, schedule_dictionary_names: names, database_pointer: (new_child?.key)!)
             }
             else{
-                let existing_child = self.ref?.child("/children/").child(student_pointer!)
+                let existing_child = self.ref?.child("/student/").child(student_pointer!)
                 let parentarray: [String: String] =  [self.parent_auth_id! : "1"]
                 existing_child?.setValue([
                     "name": name,
@@ -226,8 +257,8 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             
         else if sender as AnyObject? === monday_am {
             let mapViewController = segue.destination as! MapViewController
-            print("\(school_name.text!)")
-            mapViewController.school_database_reference = "schools/" + school_name.text!
+            //print("\(school_name.text!)")
+            //mapViewController.school_database_reference = "schools/" + school_name.text!
         }
         
         /*
@@ -316,6 +347,11 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     
     func textFieldDidEndEditing(_ textField: UITextField){
         navigationItem.title = textField.text
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        
+        valueSelected = self.schools_list[row] as String
     }
     
     // MARK: - Table view data source
