@@ -19,13 +19,13 @@ class StudentTableViewController: UITableViewController {
     
     func loadStudents() {
         var photo1 = UIImage(named: "DefaultImage")!
-        let coordinates_empty : [String:[Double]] = [:]
-        let names_empty : [String:String] = [:]
         print("Loading Students...")
+        var coordinates: [String:[Double]] = [:]
+        var names: [String:String] = [:]
         
         ref?.child(parent_location!).child("students").observeSingleEvent(of: .value, with: { (snapshot) in
             for item in snapshot.children {
-                let val = (item as AnyObject).value as String
+                let val = (item as AnyObject).key as String
                 print(val)
                 self.ref?.child("/students/").child(val).observeSingleEvent(of: .value, with: { (snapshot2) in
                     print("GET")
@@ -51,8 +51,19 @@ class StudentTableViewController: UITableViewController {
                             }
                         })
                     }
-                    let student1 = Student(name: student_name!, photo: photo1, school:student_school!, notes:student_notes!, schedule_dictionary_coordinates:coordinates_empty, schedule_dictionary_names:names_empty, database_pointer:val)!
+                    let student1 = Student(name: student_name!, photo: photo1, school:student_school!, notes:student_notes!, schedule_dictionary_coordinates:coordinates, schedule_dictionary_names:names, database_pointer:val, school_lat:0.0, school_long:0.0)!
                     self.students += [student1]
+                    
+                    for item2 in snapshot2.childSnapshot(forPath: "routes").children.allObjects{
+                        self.ref?.child("/routes/").child((item2 as AnyObject).value as String).observeSingleEvent(of: .value, with: { (snapshot3) in
+                            student1.schedule_dictionary_names[((item2 as AnyObject).key as String)] = (snapshot3.childSnapshot(forPath: "name").value as? String)!
+                            student1.schedule_dictionary_coordinates[(item2 as AnyObject).key] = [(snapshot3.childSnapshot(forPath: "location/lat").value as? Double)!,(snapshot3.childSnapshot(forPath: "location/lng").value as? Double)!]
+                            DispatchQueue.main.async{
+                                self.tableView.reloadData()
+                            }
+                        })
+                    }
+                    
                     print("size of students\(self.students.count)")
                     DispatchQueue.main.async{
                         self.tableView.reloadData()
@@ -62,38 +73,6 @@ class StudentTableViewController: UITableViewController {
         })
     }
     
-    func loadSampleStudents() {
-        let photo1 = UIImage(named: "DefaultImage")!
-        let coordinates : [String:[Double]] = [
-            "monday_am" : [19.8968, -155.5825],
-            "tuesday_am" : [30.2672, -97.7431],
-            "wednesday_am" :[-41.8101, -68.9063],
-            "thursday_am" :[-33.8688, 151.2093],
-            "friday_am" : [20.5937, 78.9629]
-            
-        ]
-        
-        let names : [String:String] = [
-            "monday_am" : "Hawaii",
-            "tuesday_am" : "Austin",
-            "wednesday_am" : "Patagonia",
-            "thursday_am" : "Australia",
-            "friday_am" : "India"
-        ]
-        let student1 = Student(name: "Bob", photo: photo1, school:"", notes:"", schedule_dictionary_coordinates:coordinates, schedule_dictionary_names: names,database_pointer:"")!
-        
-        let coordinates_empty : [String:[Double]] = [:]
-        
-        let names_empty : [String:String] = [:]
-        
-        let photo2 = UIImage(named: "DefaultImage")!
-        let student2 = Student(name: "Sally", photo: photo2, school:"", notes:"", schedule_dictionary_coordinates:coordinates_empty, schedule_dictionary_names:names_empty, database_pointer:"")!
-        
-        let photo3 = UIImage(named: "DefaultImage")!
-        let student3 = Student(name: "Tom", photo: photo3, school:"", notes:"", schedule_dictionary_coordinates:coordinates_empty, schedule_dictionary_names:names_empty, database_pointer:"")!
-        
-        students += [student1, student2, student3]
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

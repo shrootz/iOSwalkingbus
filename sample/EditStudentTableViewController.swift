@@ -41,6 +41,8 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     var schools : [String:String] = [:]
     var schools_list:[String] = []
     var valueSelected = ""
+    var schoolLat = 0.0
+    var schoolLong = 0.0
     
     @IBAction func browseForImage(_ sender: UIButton) {
         // Hide the keyboard.
@@ -91,23 +93,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         // Handle the text field’s user input through delegate callbacks.
-        schools_list.append("")
-        FIRDatabase.database().reference().child("/users/").child(parent_auth_id!).child("schools_parent").observeSingleEvent(of: .value, with: {(snap) in if snap.exists(){
-            for item in snap.children.allObjects {
-                self.schools[(item as AnyObject).value] = (item as AnyObject).key
-                self.schools_list.append((item as AnyObject).value)
-            }
-            print(self.schools_list)
-            self.schoolPicker.delegate = self
-            self.schoolPicker.dataSource = self
-            //self.schoolPicker.setNeedsDisplay()
-
-            }
-        })
-        //schoolPicker.dataSource = self
-        //schoolPicker.delegate = self
-        full_name.delegate = self
-        //schoolPicker.showsSelectionIndicator = true
+        
 
         
         if let student = student {
@@ -118,11 +104,12 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             student_pointer = student.database_pointer
             coordinates = student.schedule_dictionary_coordinates
             names = student.schedule_dictionary_names
-            if let val = student.schedule_dictionary_names["monday_am"] {
+            print(student.schedule_dictionary_names)
+            if let val = student.schedule_dictionary_names["mon_am"] {
                 monday_am.setTitle(val, for: .normal)
             }
             
-            if let val = student.schedule_dictionary_names["monday_pm"] {
+            if let val = student.schedule_dictionary_names["mon_pm"] {
                 monday_pm.setTitle(val, for: .normal)
             }
             
@@ -158,6 +145,30 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                 friday_pm.setTitle(val, for: .normal)
             }
         }
+        
+        schools_list.append("")
+        FIRDatabase.database().reference().child("/users/").child(parent_auth_id!).child("schools_parent").observeSingleEvent(of: .value, with: {(snap) in if snap.exists(){
+            self.schoolPicker.delegate = self
+            self.schoolPicker.dataSource = self
+            let myschool = self.student?.school
+            for item in snap.children.allObjects {
+                self.schools[(item as AnyObject).value] = (item as AnyObject).key
+                self.schools_list.append((item as AnyObject).value)
+                if(item as AnyObject).key == myschool {
+                    //self.schoolPicker.selectedRow(inComponent: self.schools_list.index(of: (item as AnyObject).value)!)
+                }
+            }
+            
+            //self.schoolPicker.delegate = self
+            //self.schoolPicker.dataSource = self
+            //self.schoolPicker.setNeedsDisplay()
+            
+            }
+        })
+        //schoolPicker.dataSource = self
+        //schoolPicker.delegate = self
+        full_name.delegate = self
+        //schoolPicker.showsSelectionIndicator = true
         
     }
     
@@ -231,19 +242,18 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             if(student_pointer == nil){
                 let new_child = self.ref?.child("/students/").childByAutoId()
                 let child_id = new_child?.key as String!
-                let parents_children = "users/" +  self.parent_auth_id! + "/students"
-                self.ref?.child(parents_children).childByAutoId().setValue(child_id!)
-                let parentarray: [String: String] =  [self.parent_auth_id! : "1"]
-                
+                let parentarray: [String: String] =  [self.parent_auth_id! : self.parent_auth_id!]
+
                 new_child?.setValue([
                     "name": name,
-                    "school": school,
-                    "notes": notes,
+                    "school": schools[valueSelected]!,
+                    "info": notes,
                     "bluetooth":"11:11:11:11:11:11",
                     "status":"lost",
                     "parents":parentarray
                     ])
 
+                //adds my image to the firebase storage
                     var data = Data()
                     data = UIImageJPEGRepresentation(photo!, 0)!
                     // set upload path
@@ -261,15 +271,24 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                             new_child?.updateChildValues(["photoUrl": downloadURL])
                         }
                     }
-                student = Student(name: name, photo: photo, school: school, notes: notes, schedule_dictionary_coordinates: coordinates, schedule_dictionary_names: names, database_pointer: (new_child?.key)!)
+ 
+                if(schools[valueSelected] != nil){
+                    let school_database_reference = "schools/" + schools[valueSelected]!
+                    self.ref?.child(school_database_reference).child("students").child(child_id!).setValue(name)
+                }
+                
+                let parents_children = "users/" +  self.parent_auth_id! + "/students"
+                self.ref?.child(parents_children).child(child_id!).setValue(name)
+                
+                student = Student(name: name, photo: photo, school: school, notes: notes, schedule_dictionary_coordinates: coordinates, schedule_dictionary_names: names, database_pointer: (new_child?.key)!, school_lat: schoolLat, school_long: schoolLong)
             }
             else{
                 let existing_child = self.ref?.child("/student/").child(student_pointer!)
                 let parentarray: [String: String] =  [self.parent_auth_id! : "1"]
                 existing_child?.setValue([
                     "name": name,
-                    "school": school,
-                    "notes": notes,
+                    "school": schools[valueSelected]!,
+                    "info": notes,
                     "bluetooth":"11:11:11:11:11:11",
                     "status":"lost",
                     "parents":parentarray
@@ -291,7 +310,12 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                         existing_child?.updateChildValues(["photoUrl": downloadURL])
                     }
                 }
-                student = Student(name: name, photo: photo, school: school, notes: notes, schedule_dictionary_coordinates: coordinates, schedule_dictionary_names: names, database_pointer:student_pointer!)
+                
+                if(schools[valueSelected] != nil){
+                    let school_database_reference = "schools/" + schools[valueSelected]!
+                    self.ref?.child("schools").child(school_database_reference).child("students").child(student_pointer!).setValue(name)
+                }
+                student = Student(name: name, photo: photo, school: school, notes: notes, schedule_dictionary_coordinates: coordinates, schedule_dictionary_names: names, database_pointer:student_pointer!, school_lat: schoolLat, school_long:schoolLong)
             }
         }
             
@@ -300,7 +324,8 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             let mapViewController = segue.destination as! MapViewController
             //print("\(school_name.text!)")
             mapViewController.school_database_reference = "schools/" + schools[valueSelected]!
-            
+            mapViewController.student = self.student
+            mapViewController.time = "mon_am"
         }
         
         else if sender as AnyObject? === monday_pm {
@@ -308,6 +333,8 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             let mapViewController = segue.destination as! MapViewController
             //print("\(school_name.text!)")
             mapViewController.school_database_reference = "schools/" + schools[valueSelected]!
+            mapViewController.student = self.student
+            mapViewController.time = "mon_pm"
         }
         /*
          
@@ -447,4 +474,13 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
      return true
      }
      */
+    
+    
+    @IBAction func unwindToEditStudent(sender: UIStoryboardSegue) {
+        print("FUCKIN HELL part 1")
+        if let sourceViewController = sender.source as? MapViewController, let student = sourceViewController.student {
+                self.student = student
+                print("FUCKIN HELL")
+            }
+    }
 }
