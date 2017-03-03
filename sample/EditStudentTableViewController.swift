@@ -191,11 +191,9 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     // MARK: - Navigation
     
     override func shouldPerformSegue(withIdentifier identifier: String?, sender: Any?) -> Bool {
-        print("should perform segue")
         if let ident = identifier {
-            print("checking if perform")
-            if ident == "m_am" {
-                print("id was monday am")
+            if ident == "m_am" || ident == "m_pm" || ident == "t_am" || ident == "t_pm" || ident == "w_am"
+                || ident == "w_pm" || ident == "th_am" || ident == "th_pm" || ident == "f_am" || ident == "f_pm"{
                 if (valueSelected.isEmpty) {
                     print("value was empty")
                     let toastLabel = UILabel(frame: CGRect(x: self.view.frame.size.width/2 - 150, y : self.view.frame.size.height-100, width: 300, height: 35))
@@ -305,14 +303,13 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             
         }
         
-        /*
-         if sender as AnyObject? === monday_am {
+        else if sender as AnyObject? === monday_pm {
+            print(valueSelected)
             let mapViewController = segue.destination as! MapViewController
-            if let val = coordinates["monday_am"]{
-                mapViewController.latitude = val[0]
-                mapViewController.longitude = val[1]
-            }
-         }
+            //print("\(school_name.text!)")
+            mapViewController.school_database_reference = "schools/" + schools[valueSelected]!
+        }
+        /*
          
         else if sender as AnyObject? === monday_pm {
             let mapViewController = segue.destination as! MapViewController
