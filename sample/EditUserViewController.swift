@@ -121,7 +121,11 @@ class EditUserViewController: UIViewController, UITextFieldDelegate, UIImagePick
         for (toggle,label) in schoolDict {
             if(toggle.isOn) {
                 schoolUpdates[possibleSchools[label.text!]!] = label.text
+                self.ref?.child("/schools/").child(possibleSchools[label.text!]!).child("/users").child(self.parent_auth_id!).setValue(name)
+            } else {
+                self.ref?.child("/schools/").child(possibleSchools[label.text!]!).child("/users").child(self.parent_auth_id!).removeValue()
             }
+            
         }
         self.ref?.child(self.parent_location!).updateChildValues([
             "displayName": self.nameField.text as Any,
