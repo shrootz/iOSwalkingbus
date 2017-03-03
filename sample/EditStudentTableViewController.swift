@@ -10,15 +10,15 @@ import UIKit
 import os.log
 import Firebase
 
-class EditStudentTableViewController: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDataSource,UIPickerViewDelegate {
-    
+class EditStudentTableViewController: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, UIPickerViewDataSource{
+
 
     @IBOutlet weak var student_image: UIImageView!
     @IBOutlet weak var full_name: UITextField!
     @IBOutlet weak var student_notes: UITextField!
     @IBOutlet weak var saveButton: UIBarButtonItem!
-    
     @IBOutlet weak var schoolPicker: UIPickerView!
+    
     @IBOutlet weak var monday_am: UIButton!
     @IBOutlet weak var monday_pm: UIButton!
     @IBOutlet weak var tuesday_am: UIButton!
@@ -86,33 +86,29 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         dismiss(animated: true, completion: nil)
         
     }
-    
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    @available(iOS 2.0, *)
-    public func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return schools.count
-    }
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Handle the text field’s user input through delegate callbacks.
         schools_list.append("")
         FIRDatabase.database().reference().child("/users/").child(parent_auth_id!).child("schools_parent").observeSingleEvent(of: .value, with: {(snap) in if snap.exists(){
-            print("cries")
             for item in snap.children.allObjects {
                 self.schools[(item as AnyObject).value] = (item as AnyObject).key
                 self.schools_list.append((item as AnyObject).value)
             }
+            print(self.schools_list)
+            self.schoolPicker.delegate = self
+            self.schoolPicker.dataSource = self
+            //self.schoolPicker.setNeedsDisplay()
+
             }
         })
-        schoolPicker.dataSource = self
-        schoolPicker.delegate = self
+        //schoolPicker.dataSource = self
+        //schoolPicker.delegate = self
         full_name.delegate = self
+        //schoolPicker.showsSelectionIndicator = true
+
         
         if let student = student {
             navigationItem.title = student.name
@@ -170,12 +166,58 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         // Dispose of any resources that can be recreated.
     }
     
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+    // The number of columns of data
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    // The number of rows of data
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return schools_list.count
+    }
+    
+    // The data to return for the row and component (column) that's being passed in
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return schools_list[row]
     }
     
+    // Catpure the picker view selection
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        valueSelected = schools_list[row]
+    }
+    
+    
     
     // MARK: - Navigation
+    
+    override func shouldPerformSegue(withIdentifier identifier: String?, sender: Any?) -> Bool {
+        print("should perform segue")
+        if let ident = identifier {
+            print("checking if perform")
+            if ident == "m_am" {
+                print("id was monday am")
+                if (valueSelected.isEmpty) {
+                    print("value was empty")
+                    let toastLabel = UILabel(frame: CGRect(x: self.view.frame.size.width/2 - 150, y : self.view.frame.size.height-100, width: 300, height: 35))
+                    toastLabel.backgroundColor = UIColor.black
+                    toastLabel.textColor = UIColor.white
+                    toastLabel.textAlignment = NSTextAlignment.center;
+                    self.view.addSubview(toastLabel)
+                    toastLabel.text = "Select school to select routes"
+                    toastLabel.alpha = 1.0
+                    toastLabel.layer.cornerRadius = 10;
+                    toastLabel.clipsToBounds  =  true
+                    UIView.animate(withDuration: 4.0, delay: 0.1, options: .curveEaseOut, animations: {
+                        
+                        toastLabel.alpha = 0.0
+                        
+                    }, completion: nil)
+                    return false
+                }
+            }
+        }
+        return true
+    }
     
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -256,9 +298,11 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         }
             
         else if sender as AnyObject? === monday_am {
+            print(valueSelected)
             let mapViewController = segue.destination as! MapViewController
             //print("\(school_name.text!)")
-            //mapViewController.school_database_reference = "schools/" + school_name.text!
+            mapViewController.school_database_reference = "schools/" + schools[valueSelected]!
+            
         }
         
         /*
@@ -348,11 +392,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     func textFieldDidEndEditing(_ textField: UITextField){
         navigationItem.title = textField.text
     }
-    
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        
-        valueSelected = self.schools_list[row] as String
-    }
+
     
     // MARK: - Table view data source
     /*

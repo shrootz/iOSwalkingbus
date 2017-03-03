@@ -225,7 +225,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="IXp-5E-xud">
-                                                    <rect key="frame" x="16" y="14.5" width="343" height="487.5"/>
+                                                    <rect key="frame" x="16" y="15" width="343" height="487.5"/>
                                                     <subviews>
                                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="cjR-28-gew">
                                                             <rect key="frame" x="0.0" y="0.0" width="201" height="150"/>
@@ -317,7 +317,7 @@
                                                     </constraints>
                                                     <state key="normal" title="..."/>
                                                     <connections>
-                                                        <segue destination="w0W-vp-54b" kind="show" id="XiV-dK-cO9"/>
+                                                        <segue destination="w0W-vp-54b" kind="show" identifier="m_am" id="XiV-dK-cO9"/>
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yMf-Gi-cwj">
@@ -354,7 +354,7 @@
                                                     </constraints>
                                                     <state key="normal" title="..."/>
                                                     <connections>
-                                                        <segue destination="w0W-vp-54b" kind="show" id="TGJ-zW-14Q"/>
+                                                        <segue destination="w0W-vp-54b" kind="show" identifier="m_pm" id="TGJ-zW-14Q"/>
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lTV-uC-XM2">
@@ -395,7 +395,7 @@
                                                     </constraints>
                                                     <state key="normal" title="..."/>
                                                     <connections>
-                                                        <segue destination="w0W-vp-54b" kind="show" id="g9g-OW-vxJ"/>
+                                                        <segue destination="w0W-vp-54b" kind="show" identifier="t_am" id="g9g-OW-vxJ"/>
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="C7e-uk-ovl">
@@ -432,7 +432,7 @@
                                                     </constraints>
                                                     <state key="normal" title="..."/>
                                                     <connections>
-                                                        <segue destination="w0W-vp-54b" kind="show" id="4bu-DX-EWg"/>
+                                                        <segue destination="w0W-vp-54b" kind="show" identifier="t_pm" id="4bu-DX-EWg"/>
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Or-I1-OX3">
@@ -473,7 +473,7 @@
                                                     </constraints>
                                                     <state key="normal" title="..."/>
                                                     <connections>
-                                                        <segue destination="w0W-vp-54b" kind="show" id="Uzk-UE-si6"/>
+                                                        <segue destination="w0W-vp-54b" kind="show" identifier="w_am" id="Uzk-UE-si6"/>
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Oiq-BA-kE6">
@@ -510,7 +510,7 @@
                                                     </constraints>
                                                     <state key="normal" title="..."/>
                                                     <connections>
-                                                        <segue destination="w0W-vp-54b" kind="show" id="7AV-DO-IrY"/>
+                                                        <segue destination="w0W-vp-54b" kind="show" identifier="w_pm" id="7AV-DO-IrY"/>
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bIp-CI-CKf">
@@ -551,7 +551,7 @@
                                                     </constraints>
                                                     <state key="normal" title="..."/>
                                                     <connections>
-                                                        <segue destination="w0W-vp-54b" kind="show" id="ZcU-Xi-SwD"/>
+                                                        <segue destination="w0W-vp-54b" kind="show" identifier="th_am" id="ZcU-Xi-SwD"/>
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EDY-72-Z7N">
@@ -629,7 +629,7 @@
                                                     </constraints>
                                                     <state key="normal" title="..."/>
                                                     <connections>
-                                                        <segue destination="w0W-vp-54b" kind="show" id="iKl-NI-ygi"/>
+                                                        <segue destination="w0W-vp-54b" kind="show" identifier="f_am" id="iKl-NI-ygi"/>
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bDa-4B-FdB">
@@ -716,7 +716,7 @@
                         <outlet property="monday_am" destination="a6D-MV-sLH" id="aO0-CW-kkr"/>
                         <outlet property="monday_pm" destination="CSq-eV-WHb" id="QHh-tH-Hny"/>
                         <outlet property="saveButton" destination="AUw-Ds-0Wa" id="g3A-el-RzH"/>
-                        <outlet property="schoolPicker" destination="vYY-rF-A1Y" id="gI7-jr-dJO"/>
+                        <outlet property="schoolPicker" destination="vYY-rF-A1Y" id="jBh-Af-hNQ"/>
                         <outlet property="student_image" destination="1LW-4S-4gC" id="5H3-bL-6aC"/>
                         <outlet property="student_notes" destination="Iq4-gU-vH4" id="4zr-QB-3FL"/>
                         <outlet property="thursday_am" destination="1gS-hq-2Qg" id="JAl-0R-gDR"/>
@@ -996,6 +996,6 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="OcM-Qx-rt3"/>
-        <segue reference="iKl-NI-ygi"/>
+        <segue reference="4bu-DX-EWg"/>
     </inferredMetricsTieBreakers>
 </document>
