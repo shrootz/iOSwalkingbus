@@ -79,6 +79,9 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
         var email = ""
         var phoneNumber = ""
         var photoUrl = ""
+        var students: [String] = []
+        var schoolsParent: [String:String] = [:]
+        
         let databaseLocation = String(format: "users/%@/", userAuthId)
         FIRDatabase.database().reference().child(databaseLocation).observeSingleEvent(of: .value, with: {(userSnap) in
             if(userSnap.exists()) {
@@ -87,6 +90,10 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
                 email = (userSnap.childSnapshot(forPath: "email").value as? String)!
                 photoUrl = (userSnap.childSnapshot(forPath: "photoUrl").value as? String)!
                 phoneNumber = (userSnap.childSnapshot(forPath: "phone").value as? String)!
+                if let studentsDict = userSnap.childSnapshot(forPath: "students").value as? [String:String] {
+                    students = Array(studentsDict.keys)
+                }
+                schoolsParent = (userSnap.childSnapshot(forPath: "schools_parent").value as? [String:String])!
             } else {
                 print("Adding user to database...")
                 userName = user.displayName ?? ""
@@ -104,7 +111,8 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
                     ])
             }
             
-            self.appUser = User(userAuthId: userAuthId, name: userName, phoneNumber: phoneNumber, email: email, photoUrl: photoUrl)
+            self.appUser = User(userAuthId: userAuthId, name: userName, phoneNumber: phoneNumber, email: email, photoUrl: photoUrl, students: students, schoolsParent: schoolsParent)
+    
         })
         
     }
@@ -117,6 +125,7 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
             let studentNavController = segue.destination as! UINavigationController
             let studentViewController = studentNavController.topViewController as! StudentTableViewController
             studentViewController.parentAuthId = appUser.userAuthId
+            studentViewController.appUser = appUser
         } else if segue.identifier == "editUser" {
             //Editing user information
             if let editUserViewController = segue.destination as? EditUserViewController {

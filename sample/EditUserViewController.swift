@@ -147,7 +147,7 @@ class EditUserViewController: UIViewController, UITextFieldDelegate, UIImagePick
             print("Saving updated user...")
             let userSchoolUpdates = updateSchools()
             updateUser(userSchoolUpdates: userSchoolUpdates)
-            self.appUser.update(name: nameField.text,phoneNumber: phoneField.text,email: emailField.text)
+            self.appUser.update(name: nameField.text,phoneNumber: phoneField.text,email: emailField.text, schoolsParent:userSchoolUpdates)
             controller.appUser = self.appUser
         }
     }

@@ -59,12 +59,11 @@ class MapViewController: UIViewController, GMSMapViewDelegate {
                     print(snap)
                     //self.longitude = (snap.childSnapshot(forPath: "latitude").value as? Double)!
                     self.latitude = snap.value as! Double
-                self.student?.setSchoolLat(lat: self.latitude)
+                
                 self.ref?.child(self.school_database_reference!).child("lng").observeSingleEvent(of: .value, with: {(snap2) in
                     print("reading school coordinates")
                     if snap2.exists(){
                         self.longitude = snap2.value as! Double
-                        self.student?.setSchoolLong(long: self.longitude)
                         //self.latitude = (snap.childSnapshot(forPath: "longitude").value as? Double)!
                     }
                 })
@@ -84,12 +83,12 @@ class MapViewController: UIViewController, GMSMapViewDelegate {
                             let marker = GMSMarker()
                             marker.position = CLLocationCoordinate2D(latitude: route_lat, longitude: route_long)
                             marker.map = (self.view as! GMSMapView)
-                            if (self.student?.schedule_dictionary_coordinates[self.time!]?[0] == route_lat && self.student?.schedule_dictionary_coordinates[self.time!]?[1] == route_long ) {
+                            /*if (self.student?.schedule_dictionary_coordinates[self.time!]?[0] == route_lat && self.student?.schedule_dictionary_coordinates[self.time!]?[1] == route_long ) {
                                 self.currentMarker = marker
                                 marker.icon = GMSMarker.markerImage(with: .black)
                             } else {
                                 marker.icon = GMSMarker.markerImage(with: .red)
-                            }
+                            } */
                             marker.userData = (item as AnyObject).key as String!
                         }
                     })
@@ -147,10 +146,10 @@ class MapViewController: UIViewController, GMSMapViewDelegate {
         print("Saving updated parent...")
         if(currentMarker != nil){
         print(currentMarker?.userData as! String)
-        print((student?.database_pointer)!)
-        self.ref?.child("/routes/").child(currentMarker?.userData as! String).child("students/").child(time!).child((student?.database_pointer)!).setValue(student?.name)
+    
+        self.ref?.child("/routes/").child(currentMarker?.userData as! String).child("students/").child(time!).child((student?.studentDatabaseId)!).setValue(student?.name)
         print("one fin")
-        self.ref?.child("students/").child((student?.database_pointer)!).child("/routes/").child(time!).setValue(currentMarker?.userData  as! String)
+        //self.ref?.child("students/").child((student?.database_pointer)!).child("/routes/").child(time!).setValue(currentMarker?.userData  as! String)
         print("fin all")
         }
     }

@@ -16,19 +16,24 @@ class User {
     var phoneNumber: String?
     var email: String?
     var photoUrl: String?
+    var students: [String]?
+    var schoolsParent: [String:String]?
     
-    init?(userAuthId: String, name: String, phoneNumber: String, email: String, photoUrl: String){
+    init?(userAuthId: String, name: String, phoneNumber: String, email: String, photoUrl: String, students: [String], schoolsParent: [String:String]){
         self.userAuthId = userAuthId
         self.name = name
         self.phoneNumber = phoneNumber
         self.email = email
         self.photoUrl = photoUrl
+        self.students = students
+        self.schoolsParent = schoolsParent
     }
     
-    func update(name: String?, phoneNumber: String?, email: String?){
+    func update(name: String?, phoneNumber: String?, email: String?, schoolsParent: [String:String]){
         self.name = name ?? ""
         self.phoneNumber = phoneNumber ?? ""
         self.email = email ?? ""
+        self.schoolsParent = schoolsParent
     }
     
 }

@@ -143,22 +143,22 @@
 		D08A0AB71DC18F2500EECEA1 /* sample */ = {
 			isa = PBXGroup;
 			children = (
-				D000530A1E4E5358004AE9AC /* GoogleService-Info.plist */,
 				D08A0AB81DC18F2500EECEA1 /* AppDelegate.swift */,
-				D08A0ABC1DC18F2500EECEA1 /* Main.storyboard */,
-				D07190E21DCC46BD00CDF595 /* StudentTableViewController.swift */,
-				D07190E01DCC42A700CDF595 /* StudentTableViewCell.swift */,
 				D08A0ABF1DC18F2500EECEA1 /* Assets.xcassets */,
-				D08A0AC11DC18F2500EECEA1 /* LaunchScreen.storyboard */,
-				D08A0AC41DC18F2500EECEA1 /* Info.plist */,
-				D07190E41DCC4B4D00CDF595 /* Student.swift */,
-				D07C356A1E3950B6006415E7 /* MapViewController.swift */,
-				D01C723A1E481FE400E21BAB /* EditStudentTableViewController.swift */,
-				D01C723E1E48301500E21BAB /* debug.swift */,
 				2064FE581E4BB08400BFBF53 /* ChaperoneTableViewController.swift */,
-				D00053131E4E6339004AE9AC /* sample-Bridging-Header.h */,
+				D01C723E1E48301500E21BAB /* debug.swift */,
+				D01C723A1E481FE400E21BAB /* EditStudentTableViewController.swift */,
 				2064D8DD1E677B0300D5B268 /* EditUserViewController.swift */,
+				D000530A1E4E5358004AE9AC /* GoogleService-Info.plist */,
 				D09D1EC11E6A2EAB00A3066D /* HomeScreenViewController.swift */,
+				D08A0AC41DC18F2500EECEA1 /* Info.plist */,
+				D08A0AC11DC18F2500EECEA1 /* LaunchScreen.storyboard */,
+				D08A0ABC1DC18F2500EECEA1 /* Main.storyboard */,
+				D07C356A1E3950B6006415E7 /* MapViewController.swift */,
+				D00053131E4E6339004AE9AC /* sample-Bridging-Header.h */,
+				D07190E41DCC4B4D00CDF595 /* Student.swift */,
+				D07190E01DCC42A700CDF595 /* StudentTableViewCell.swift */,
+				D07190E21DCC46BD00CDF595 /* StudentTableViewController.swift */,
 				D09D1EC31E6A4EB100A3066D /* User.swift */,
 			);
 			path = sample;

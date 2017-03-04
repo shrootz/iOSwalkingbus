@@ -11,68 +11,69 @@ import Firebase
 
 class StudentTableViewController: UITableViewController {
     
+    //MARK: - Variables
     var students = [Student]()
-    var ref: FIRDatabaseReference?
-    var parent_location: String?
     var parentAuthId: String?
+    var appUser: User?
     
-    
+    //MARK: - Load
     func loadStudents() {
-        var photo1 = UIImage(named: "DefaultImage")!
-        print("Loading Students...")
-        var coordinates: [String:[Double]] = [:]
-        var names: [String:String] = [:]
+        print("Getting details for students")
+        for studentKey in (appUser?.students)! {
+            FIRDatabase.database().reference().child("/students/").child(studentKey).observeSingleEvent(of: .value, with: { (studentDetailsSnap) in
+                let student_name = studentDetailsSnap.childSnapshot(forPath: "name").value as? String
+                let student_notes = studentDetailsSnap.childSnapshot(forPath: "info").value as? String
+                let student_school = studentDetailsSnap.childSnapshot(forPath: "school").value as? String
+                let school_name = self.appUser?.schoolsParent?[student_school!]
+                
+                //set up schedule dictionary for student
+                var schedule: [String: [String]] = [:]
+                for route in (studentDetailsSnap.childSnapshot(forPath: "routes").value as? [String:String])! {
+                    schedule[route.key] = [String](repeating: "", count:2)
+                    schedule[route.key]?[0] = route.value
+                }
+                
+                //create local student object
+                print(student_name!)
+                print(student_notes!)
+                print(schedule)
+                print(studentKey)
+                print(student_school!)
+                print(self.appUser?.schoolsParent!)
+                print(school_name!)
+
+                let myStudent = Student(name: student_name!, photo: UIImage(named:"DefaultImage"), schoolName:school_name!, info:student_notes!, schedule:schedule, studentDatabaseId:studentKey, schoolDatabaseId:student_school!)!
+                self.students += [myStudent]
+                if studentDetailsSnap.hasChild("photoUrl"){
+                    let photoLocation = "\(studentKey)/\("photoUrl")"
+                    self.loadStudentPhoto(withLocation: photoLocation, forStudent:studentKey)
+                }
+                
+                DispatchQueue.main.async{
+                    self.tableView.reloadData()
+                }
+            })
+        }
         
-        ref?.child(parent_location!).child("students").observeSingleEvent(of: .value, with: { (snapshot) in
-            for item in snapshot.children {
-                let val = (item as AnyObject).key as String
-                print(val)
-                self.ref?.child("/students/").child(val).observeSingleEvent(of: .value, with: { (snapshot2) in
-                    print("GET")
-                    print(snapshot2)
-                    let student_name = snapshot2.childSnapshot(forPath: "name").value as? String
-                    let student_notes = snapshot2.childSnapshot(forPath: "info").value as? String
-                    let student_school = snapshot2.childSnapshot(forPath: "school").value as? String
-                    if snapshot2.hasChild("photoUrl"){
-                        let filePath = "\(val)/\("photoUrl")"
-                        FIRStorage.storage().reference().child(filePath).data(withMaxSize: 10*1024*1024, completion: { (data, error) in
-                            print("storing the image")
-                            if let imageUrl = UIImage(data: data!) {
-                                photo1 = imageUrl  // you can use your imageUrl UIImage (note: imageUrl it is not an optional here)
-                                for student in self.students {
-                                    if student.database_pointer == val{
-                                        student.setImage(photo: photo1)
-                                        DispatchQueue.main.async{
-                                            self.tableView.reloadData()
-                                        }
-                                    }
-                                    
-                                }
-                            }
-                        })
-                    }
-                    let student1 = Student(name: student_name!, photo: photo1, school:student_school!, notes:student_notes!, schedule_dictionary_coordinates:coordinates, schedule_dictionary_names:names, database_pointer:val, school_lat:0.0, school_long:0.0)!
-                    self.students += [student1]
-                    
-                    for item2 in snapshot2.childSnapshot(forPath: "routes").children.allObjects{
-                        self.ref?.child("/routes/").child((item2 as AnyObject).value as String).observeSingleEvent(of: .value, with: { (snapshot3) in
-                            student1.schedule_dictionary_names[((item2 as AnyObject).key as String)] = (snapshot3.childSnapshot(forPath: "name").value as? String)!
-                            student1.schedule_dictionary_coordinates[(item2 as AnyObject).key] = [(snapshot3.childSnapshot(forPath: "location/lat").value as? Double)!,(snapshot3.childSnapshot(forPath: "location/lng").value as? Double)!]
-                            DispatchQueue.main.async{
-                                self.tableView.reloadData()
-                            }
-                        })
+    }
+    
+    func loadStudentPhoto(withLocation: String, forStudent:String) {
+        print("Getting student photo from " + withLocation)
+        FIRStorage.storage().reference().child(withLocation).data(withMaxSize: 10*1024*1024, completion: { (data, error) in
+            print("storing the image")
+            if let photo = UIImage(data: data!) {
+                for student in self.students {
+                    if student.studentDatabaseId == forStudent{
+                        student.photo = photo
+                        DispatchQueue.main.async{
+                            self.tableView.reloadData()
+                        }
                     }
                     
-                    print("size of students\(self.students.count)")
-                    DispatchQueue.main.async{
-                        self.tableView.reloadData()
-                    }
-                })
+                }
             }
         })
     }
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -103,8 +104,8 @@ class StudentTableViewController: UITableViewController {
         let student = students[indexPath.row]
         cell.nameLabel.text = student.name
         cell.photoImageView.image = student.photo
-        cell.schoolLabel.text = student.school
-        cell.chaperoneLabel.text = student.notes
+        cell.schoolLabel.text = student.schoolName
+        cell.chaperoneLabel.text = student.info
         return cell
     }
     
@@ -174,7 +175,6 @@ class StudentTableViewController: UITableViewController {
                 let indexPath = tableView.indexPath(for: selectedStudentCell)!
                 let selectedStudent = students[indexPath.row]
                 studentDetailViewController.student = selectedStudent
-                studentDetailViewController.ref = self.ref
                 studentDetailViewController.parent_auth_id = self.parentAuthId
             }
         }
@@ -182,7 +182,6 @@ class StudentTableViewController: UITableViewController {
             print("Adding new student.")
             let studentDetailNavController = segue.destination as! UINavigationController
             let studentDetailViewController = studentDetailNavController.topViewController as! EditStudentTableViewController
-            studentDetailViewController.ref = self.ref
             studentDetailViewController.parent_auth_id = self.parentAuthId
         }
     }

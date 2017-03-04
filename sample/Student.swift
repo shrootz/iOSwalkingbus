@@ -11,43 +11,33 @@ import UIKit
 class Student {
     // MARK: Properties
     var name: String
-    var school: String
-    var notes: String
+    var schoolName: String
+    var info: String
     var photo: UIImage?
-    var schedule_dictionary_coordinates: [String: [Double]]
-    var schedule_dictionary_names: [String: String]
-    var database_pointer: String
-    var school_lat: Double?
-    var school_long: Double?
+    var schedule: [String: [String]]
+    var studentDatabaseId: String
+    var schoolDatabaseId: String
     
     // MARK: Initialization
     
-    init?(name: String, photo: UIImage?, school: String, notes: String, schedule_dictionary_coordinates: [String: [Double]], schedule_dictionary_names: [String: String], database_pointer: String, school_lat:Double, school_long:Double) {
+    init?(name: String, photo: UIImage?, schoolName: String, info: String, schedule: [String: [String]], studentDatabaseId: String, schoolDatabaseId: String) {
         // Initialize stored properties.
         self.name = name
         self.photo = photo
-        self.school = school
-        self.notes = notes
-        self.schedule_dictionary_coordinates = schedule_dictionary_coordinates
-        self.schedule_dictionary_names = schedule_dictionary_names
-        self.database_pointer = database_pointer
-        self.school_long = school_long
-        self.school_lat = school_lat
+        self.schoolName = schoolName
+        self.info = info
+        self.schedule = schedule
+        self.studentDatabaseId = studentDatabaseId
+        self.schoolDatabaseId = schoolDatabaseId
         if name.isEmpty {
             return nil
         }
     }
     
-    func setImage(photo: UIImage) {
-        self.photo = photo
-    }
-    
-    func setSchoolLat(lat: Double) {
-        school_lat = lat
-    }
-    
-    func setSchoolLong(long: Double) {
-        school_long = long
-    }
-    
+}
+
+extension Student: Equatable {}
+
+func ==(lhs: Student, rhs: Student) -> Bool {
+    return lhs.studentDatabaseId == rhs.studentDatabaseId
 }

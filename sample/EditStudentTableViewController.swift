@@ -34,7 +34,6 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     
     var student: Student?
     var coordinates : [String:[Double]] = [:]
-    var names : [String:String] = [:]
     var ref: FIRDatabaseReference?
     var parent_auth_id: String?
     var student_pointer: String?
@@ -99,50 +98,48 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         if let student = student {
             navigationItem.title = student.name
             full_name.text   = student.name
-            student_notes.text = student.notes
+            student_notes.text = student.info
             student_image.image = student.photo
-            student_pointer = student.database_pointer
-            coordinates = student.schedule_dictionary_coordinates
-            names = student.schedule_dictionary_names
-            print(student.schedule_dictionary_names)
-            if let val = student.schedule_dictionary_names["mon_am"] {
-                monday_am.setTitle(val, for: .normal)
+            student_pointer = student.studentDatabaseId
+            print(student.schedule)
+            if let val = student.schedule["mon_am"] {
+                monday_am.setTitle(val[1], for: .normal)
             }
             
-            if let val = student.schedule_dictionary_names["mon_pm"] {
-                monday_pm.setTitle(val, for: .normal)
+            if let val = student.schedule["mon_pm"] {
+                monday_pm.setTitle(val[1], for: .normal)
             }
             
-            if let val = student.schedule_dictionary_names["tuesday_am"] {
-                tuesday_am.setTitle(val, for: .normal)
+            if let val = student.schedule["tues_am"] {
+                tuesday_am.setTitle(val[1], for: .normal)
             }
             
-            if let val = student.schedule_dictionary_names["tuesday_pm"] {
-                tuesday_pm.setTitle(val, for: .normal)
+            if let val = student.schedule["tues_pm"] {
+                tuesday_pm.setTitle(val[1], for: .normal)
             }
             
-            if let val = student.schedule_dictionary_names["wednesday_am"] {
-                wednesday_am.setTitle(val, for: .normal)
+            if let val = student.schedule["wed_am"] {
+                wednesday_am.setTitle(val[1], for: .normal)
             }
             
-            if let val = student.schedule_dictionary_names["wednesday_pm"] {
-                wednesday_pm.setTitle(val, for: .normal)
+            if let val = student.schedule["wed_pm"] {
+                wednesday_pm.setTitle(val[1], for: .normal)
             }
             
-            if let val = student.schedule_dictionary_names["thursday_am"] {
-                thursday_am.setTitle(val, for: .normal)
+            if let val = student.schedule["thurs_am"] {
+                thursday_am.setTitle(val[1], for: .normal)
             }
             
-            if let val = student.schedule_dictionary_names["thursday_pm"] {
-                thursday_pm.setTitle(val, for: .normal)
+            if let val = student.schedule["thurs_pm"] {
+                thursday_pm.setTitle(val[1], for: .normal)
             }
             
-            if let val = student.schedule_dictionary_names["friday_am"] {
-                friday_am.setTitle(val, for: .normal)
+            if let val = student.schedule["fri_am"] {
+                friday_am.setTitle(val[1], for: .normal)
             }
             
-            if let val = student.schedule_dictionary_names["friday_pm"] {
-                friday_pm.setTitle(val, for: .normal)
+            if let val = student.schedule["fri_pm"] {
+                friday_pm.setTitle(val[1], for: .normal)
             }
         }
         
@@ -150,7 +147,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         FIRDatabase.database().reference().child("/users/").child(parent_auth_id!).child("schools_parent").observeSingleEvent(of: .value, with: {(snap) in if snap.exists(){
             self.schoolPicker.delegate = self
             self.schoolPicker.dataSource = self
-            let myschool = self.student?.school
+            let myschool = self.student?.schoolName
             for item in snap.children.allObjects {
                 self.schools[(item as AnyObject).value] = (item as AnyObject).key
                 self.schools_list.append((item as AnyObject).value)
@@ -280,7 +277,8 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                 let parents_children = "users/" +  self.parent_auth_id! + "/students"
                 self.ref?.child(parents_children).child(child_id!).setValue(name)
                 
-                student = Student(name: name, photo: photo, school: school, notes: notes, schedule_dictionary_coordinates: coordinates, schedule_dictionary_names: names, database_pointer: (new_child?.key)!, school_lat: schoolLat, school_long: schoolLong)
+                //student = Student(name: name, photo: photo, schoolName: school, info: notes, schedule: , studentDatabaseId: (new_child?.key)!, schoolDatabaseId: )
+                
             }
             else{
                 let existing_child = self.ref?.child("/student/").child(student_pointer!)
@@ -315,7 +313,8 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                     let school_database_reference = "schools/" + schools[valueSelected]!
                     self.ref?.child("schools").child(school_database_reference).child("students").child(student_pointer!).setValue(name)
                 }
-                student = Student(name: name, photo: photo, school: school, notes: notes, schedule_dictionary_coordinates: coordinates, schedule_dictionary_names: names, database_pointer:student_pointer!, school_lat: schoolLat, school_long:schoolLong)
+                let empty:[String:[String]] = [:]
+                student = Student(name: name, photo: photo, schoolName: school, info: notes, schedule: empty, studentDatabaseId: "", schoolDatabaseId:student_pointer!)
             }
         }
             
@@ -483,4 +482,5 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                 print("FUCKIN HELL")
             }
     }
+    
 }
