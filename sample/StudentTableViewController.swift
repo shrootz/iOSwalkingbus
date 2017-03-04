@@ -14,7 +14,7 @@ class StudentTableViewController: UITableViewController {
     var students = [Student]()
     var ref: FIRDatabaseReference?
     var parent_location: String?
-    var parent_auth_id: String?
+    var parentAuthId: String?
     
     
     func loadStudents() {
@@ -175,7 +175,7 @@ class StudentTableViewController: UITableViewController {
                 let selectedStudent = students[indexPath.row]
                 studentDetailViewController.student = selectedStudent
                 studentDetailViewController.ref = self.ref
-                studentDetailViewController.parent_auth_id = self.parent_auth_id
+                studentDetailViewController.parent_auth_id = self.parentAuthId
             }
         }
         else if segue.identifier == "AddItem" {
@@ -183,7 +183,7 @@ class StudentTableViewController: UITableViewController {
             let studentDetailNavController = segue.destination as! UINavigationController
             let studentDetailViewController = studentDetailNavController.topViewController as! EditStudentTableViewController
             studentDetailViewController.ref = self.ref
-            studentDetailViewController.parent_auth_id = self.parent_auth_id
+            studentDetailViewController.parent_auth_id = self.parentAuthId
         }
     }
     

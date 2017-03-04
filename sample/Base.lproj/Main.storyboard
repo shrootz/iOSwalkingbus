@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="68W-so-DSi">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="uQb-hd-fuH">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -188,7 +188,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CZb-Df-FAz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-598" y="958"/>
+            <point key="canvasLocation" x="-599.20000000000005" y="957.57121439280365"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="KUd-2s-8ON">
@@ -791,50 +791,6 @@
             </objects>
             <point key="canvasLocation" x="2431" y="546"/>
         </scene>
-        <!--Sign In View Controller-->
-        <scene sceneID="fsp-ii-Tt5">
-            <objects>
-                <viewController id="68W-so-DSi" customClass="SignInViewController" customModule="sample" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="1Mv-hp-181"/>
-                        <viewControllerLayoutGuide type="bottom" id="IC1-v7-7eq"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="q1V-Be-2Ne">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ycu-Yd-sQu" customClass="GIDSignInButton">
-                                <rect key="frame" x="67" y="229" width="240" height="128"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            </view>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    </view>
-                    <connections>
-                        <segue destination="DSY-3J-xfJ" kind="show" identifier="home_screen" id="GUP-Qw-mQ4"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="aOG-0z-XQb" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-2377" y="127"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="Qp7-kr-cJI">
-            <objects>
-                <navigationController id="DSY-3J-xfJ" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="nUs-s7-d1v">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <connections>
-                        <segue destination="kPk-Sj-PFJ" kind="relationship" relationship="rootViewController" id="fHN-sL-XYC"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dbI-SP-icV" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-1457" y="126"/>
-        </scene>
         <!--Edit User View Controller-->
         <scene sceneID="rSj-Z9-AH7">
             <objects>
@@ -928,10 +884,26 @@
             </objects>
             <point key="canvasLocation" x="902" y="-1005"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="joC-uo-Vlt">
+            <objects>
+                <navigationController id="uQb-hd-fuH" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="Bjb-jN-J9W">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="kPk-Sj-PFJ" kind="relationship" relationship="rootViewController" id="f7v-1T-Cay"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xOp-2k-Wz9" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1494" y="126"/>
+        </scene>
         <!--home_screen-->
         <scene sceneID="bNJ-OP-xHA">
             <objects>
-                <viewController storyboardIdentifier="home_screen" title="home_screen" id="kPk-Sj-PFJ" customClass="HomeViewController" customModule="sample" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="home_screen" title="home_screen" id="kPk-Sj-PFJ" customClass="HomeScreenViewController" customModule="sample" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Fkv-bM-r2E"/>
                         <viewControllerLayoutGuide type="bottom" id="ya5-3o-5uj"/>
@@ -941,7 +913,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="AiU-Kd-3P6">
-                                <rect key="frame" x="127" y="293" width="120" height="80"/>
+                                <rect key="frame" x="127" y="268" width="120" height="130"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aHV-pb-bfC">
                                         <rect key="frame" x="0.0" y="0.0" width="120" height="30"/>
@@ -956,7 +928,14 @@
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <state key="normal" title="Parent Home"/>
                                         <connections>
-                                            <segue destination="H3T-t2-6Bz" kind="show" identifier="EnterParent" id="qNG-oC-lMb"/>
+                                            <segue destination="H3T-t2-6Bz" kind="show" identifier="enterParent" id="qNG-oC-lMb"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="biC-sT-RJj">
+                                        <rect key="frame" x="0.0" y="100" width="120" height="30"/>
+                                        <state key="normal" title="Sign Out"/>
+                                        <connections>
+                                            <action selector="signOut:" destination="kPk-Sj-PFJ" eventType="touchUpInside" id="452-xr-6Jc"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -970,10 +949,16 @@
                                     <constraint firstAttribute="width" secondItem="QLN-ip-wvf" secondAttribute="height" multiplier="65:36" id="uFJ-t7-fEf"/>
                                 </constraints>
                             </imageView>
+                            <view contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kaq-oe-Gee" customClass="GIDSignInButton">
+                                <rect key="frame" x="67" y="110" width="240" height="128"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="kaq-oe-Gee" firstAttribute="centerY" secondItem="POF-lV-HQh" secondAttribute="centerY" id="I0c-Tj-SYh"/>
                             <constraint firstItem="QLN-ip-wvf" firstAttribute="centerX" secondItem="POF-lV-HQh" secondAttribute="centerX" id="adi-go-9o9"/>
+                            <constraint firstItem="kaq-oe-Gee" firstAttribute="centerX" secondItem="POF-lV-HQh" secondAttribute="centerX" id="bz9-qD-dEM"/>
                             <constraint firstItem="AiU-Kd-3P6" firstAttribute="centerX" secondItem="POF-lV-HQh" secondAttribute="centerX" id="i48-4q-MJA"/>
                             <constraint firstItem="QLN-ip-wvf" firstAttribute="centerY" secondItem="POF-lV-HQh" secondAttribute="centerY" constant="150" id="lLl-d9-6mH"/>
                             <constraint firstAttribute="trailingMargin" secondItem="QLN-ip-wvf" secondAttribute="trailing" constant="10" id="qKH-Je-RZD"/>
@@ -988,6 +973,10 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="signInButton" destination="kaq-oe-Gee" id="3hF-Lk-Vm4"/>
+                        <outlet property="userModeButtons" destination="AiU-Kd-3P6" id="a9X-2M-7Cv"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oq4-wF-fPU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -999,7 +988,7 @@
         <image name="Screen Shot 2017-02-17 at 5.02.31 AM" width="334" height="228"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="OcM-Qx-rt3"/>
+        <segue reference="uEZ-P6-UyX"/>
         <segue reference="Ftg-DE-fFi"/>
     </inferredMetricsTieBreakers>
 </document>

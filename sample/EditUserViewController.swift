@@ -11,70 +11,86 @@ import Firebase
 
 class EditUserViewController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    var ref: FIRDatabaseReference?
-    var parent_location: String?
-    var parent_auth_id: String?
-    var name: String?
-    var phone: String?
-    var email: String?
-    var photoUrl: String?
-    var schoolDict: [UISwitch:UILabel] = [:]
-    var mySchools:[String] = []
-    var possibleSchools: [String:String] = [:]
+    //Mark: - Outlets
     @IBOutlet weak var imageDisplay: UIImageView!
     @IBOutlet weak var nameField: UITextField!
-    
     @IBOutlet weak var schoolLabel: UILabel!
     @IBOutlet weak var phoneField: UITextField!
     @IBOutlet weak var emailField: UITextField!
+    
+    //Mark: - Variables
+    var appUser: User!
+    var schoolDict: [UISwitch:UILabel] = [:]
+    var mySchools:[String] = []
+    var possibleSchools: [String:String] = [:]
+    
+    //MARK: - Load
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.delegate = self
         self.navigationController?.navigationBar.isTranslucent = false;
-        nameField.text = name
-        phoneField.text = phone
-        emailField.text = email
-        //get image here
-        if let checkedUrl = URL(string: photoUrl!) {
+        nameField.text = appUser.name ?? ""
+        phoneField.text = appUser.phoneNumber ?? ""
+        emailField.text = appUser.email ?? ""
+        if let checkedUrl = URL(string: appUser.photoUrl!) {
             imageDisplay.contentMode = .scaleAspectFit
             downloadImage(url: checkedUrl)
         }
         
-        //load schools
-        self.ref?.child(parent_location!).child("schools_parent").observeSingleEvent(of: .value, with: {(snap1) in
-            if (snap1.exists()) {
-                for item in snap1.children.allObjects {
-                    self.mySchools.append((item as AnyObject).value)
+        loadSchools()
+    }
+    
+    func loadSchools() {
+        
+        //Loading my schools
+        print("Getting my schools...")
+        let databaseReference = FIRDatabase.database().reference().child("users").child(appUser.userAuthId).child("schools_parent")
+        databaseReference.observeSingleEvent(of: .value, with: {(mySchools) in
+            if (mySchools.exists()) {
+                for schoolEntry in mySchools.children.allObjects {
+                    let schoolName = (schoolEntry as AnyObject).value as String
+                    self.mySchools.append(schoolName)
                 }
             }
             
-            FIRDatabase.database().reference().child("/school_names/").observeSingleEvent(of: .value, with: {(snap) in
-                if snap.exists(){
-                    let last_x = self.schoolLabel.frame.maxX + 25
-                    var last_y = self.schoolLabel.frame.maxY
-                    for item in snap.children.allObjects {
-                        let mySwitch = UISwitch(frame:CGRect(x: last_x, y: last_y + 5, width: 0, height: 0))
-                        mySwitch.setOn(false, animated: false)
-                        let myLabel = UILabel(frame:CGRect(x: last_x + 75, y: last_y + 5, width: 200, height: 21))
-                        myLabel.text = (item as AnyObject).key
-                        self.schoolDict[mySwitch] = myLabel
-                        if (self.mySchools.contains(myLabel.text!)) {
-                            mySwitch.setOn(true, animated: false)
-                        }
-                        self.possibleSchools[(item as AnyObject).key] = (item as AnyObject).value
-                        last_y = mySwitch.frame.maxY
-                        self.view.addSubview(mySwitch)
-                        self.view.addSubview(myLabel)
-                        //mySwitch.addTarget(self, action: #selector())
-                    }
-                }
-            })
-        
+            self.loadAllPossibleSchools()
         })
-        
-
         
     }
     
+    func loadAllPossibleSchools() {
+        print("Getting all possible schools...")
+        let databaseReference = FIRDatabase.database().reference().child("/school_names/")
+        databaseReference.observeSingleEvent(of: .value, with: {(allSchools) in
+            if allSchools.exists(){
+                //add a toggle and label for all schools
+                let last_x = self.schoolLabel.frame.maxX + 25
+                var last_y = self.schoolLabel.frame.maxY
+                for item in allSchools.children.allObjects {
+                    let mySwitch = UISwitch(frame:CGRect(x: last_x, y: last_y + 5, width: 0, height: 0))
+                    mySwitch.setOn(false, animated: false)
+                    let myLabel = UILabel(frame:CGRect(x: last_x + 75, y: last_y + 5, width: 200, height: 21))
+                    myLabel.text = (item as AnyObject).key
+                    self.schoolDict[mySwitch] = myLabel
+                    if (self.mySchools.contains(myLabel.text!)) {
+                        mySwitch.setOn(true, animated: false)
+                    }
+                    self.possibleSchools[(item as AnyObject).key] = (item as AnyObject).value
+                    last_y = mySwitch.frame.maxY
+                    self.view.addSubview(mySwitch)
+                    self.view.addSubview(myLabel)
+                }
+            }
+        })
+        
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    //MARK: - Functions
     func getDataFromUrl(url: URL, completion: @escaping (_ data: Data?, _  response: URLResponse?, _ error: Error?) -> Void) {
         URLSession.shared.dataTask(with: url) {
             (data, response, error) in
@@ -83,65 +99,57 @@ class EditUserViewController: UIViewController, UITextFieldDelegate, UIImagePick
     }
     
     func downloadImage(url: URL) {
-        print("Download Started")
         getDataFromUrl(url: url) { (data, response, error)  in
             guard let data = data, error == nil else { return }
-            print(response?.suggestedFilename ?? url.lastPathComponent)
-            print("Download Finished")
             DispatchQueue.main.async() { () -> Void in
                 self.imageDisplay.image = UIImage(data: data)
             }
         }
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    @IBAction func browseForImage(_ sender: UIButton) {
-        // Hide the keyboard.
-        nameField.resignFirstResponder()
-        
-        // UIImagePickerController is a view controller that lets a user pick media from their photo library.
-        let imagePickerController = UIImagePickerController()
-        
-        // Only allow photos to be picked, not taken.
-        imagePickerController.sourceType = .photoLibrary
-        
-        // Make sure ViewController is notified when the user picks an image.
-        imagePickerController.delegate = self
-        
-        present(imagePickerController, animated: true, completion: nil)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        print("Saving updated parent...")
+    //MARK: - Save
+    func updateSchools() -> [String:String]{
+        print("Saving updated user for schools")
         var schoolUpdates = [String:String]()
         for (toggle,label) in schoolDict {
-            if(toggle.isOn) {
-                schoolUpdates[possibleSchools[label.text!]!] = label.text
-                self.ref?.child("/schools/").child(possibleSchools[label.text!]!).child("/users").child(self.parent_auth_id!).setValue(name)
-            } else {
-                self.ref?.child("/schools/").child(possibleSchools[label.text!]!).child("/users").child(self.parent_auth_id!).removeValue()
+            if let schoolName = label.text {
+                let databaseReference = FIRDatabase.database().reference().child("schools").child(possibleSchools[schoolName]!).child("users").child(appUser.userAuthId)
+                if(toggle.isOn) {
+                    schoolUpdates[possibleSchools[schoolName]!] = schoolName
+                    databaseReference.setValue(appUser.name)
+                } else {
+                    databaseReference.removeValue()
+                }
             }
             
         }
-        self.ref?.child(self.parent_location!).updateChildValues([
+        return schoolUpdates
+    }
+    
+    func updateUser(userSchoolUpdates: [String:String]) {
+        //update user information
+        print("Saving user updates...")
+        let databaseReference = FIRDatabase.database().reference().child("users").child(appUser.userAuthId)
+        databaseReference.updateChildValues([
             "displayName": self.nameField.text as Any,
             "email":self.emailField.text as Any,
             "phone":self.phoneField.text as Any])
+        
+        //overwrite previous school information for this user
+        databaseReference.child("schools_parent").setValue(userSchoolUpdates)
 
-        self.ref?.child(self.parent_location!).child("schools_parent").setValue(schoolUpdates)
     }
     
     // MARK: - Navigation
     
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    //override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    //}
-
+    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+        if let controller = viewController as? HomeScreenViewController {
+            print("Saving updated user...")
+            let userSchoolUpdates = updateSchools()
+            updateUser(userSchoolUpdates: userSchoolUpdates)
+            self.appUser.update(name: nameField.text,phoneNumber: phoneField.text,email: emailField.text)
+            controller.appUser = self.appUser
+        }
+    }
 
 }
