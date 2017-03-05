@@ -10,157 +10,176 @@ import UIKit
 import GoogleMaps
 import Firebase
 
-class MapViewController: UIViewController, GMSMapViewDelegate {
+class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationControllerDelegate {
     
-    var longitude:Double = -97.7431
-    var latitude:Double = 30.2672
-    var school_database_reference:String?
-    var ref:FIRDatabaseReference?
+    //MARK: - Variables
+    var longitudeDefault:Double = -97.7431
+    var latitudeDefault:Double = 30.2672
     var student: Student?
     var time: String?
-    
     var currentMarker : GMSMarker?
+    var markerRouteKeyMapping: [String:GMSMarker] = [:] //allows for loading name of route later
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        // Do any additional setup after loading the view.
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    
-    override func loadView() {
-        // Create a GMSCameraPosition that tells the map to display the
-        // coordinate -33.86,151.20 at zoom level 6.
-        /*if (student?.school_lat != nil && student?.school_long != nil) {
-            print("not nil")
-            self.latitude = (student?.school_lat)!
-            self.longitude = (student?.school_long)!
-            let camera = GMSCameraPosition.camera(withLatitude: self.latitude, longitude: self.longitude, zoom: 15.0)
-            let mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
-            self.view = mapView
 
-        } else { */
-            print("nil")
-            let camera = GMSCameraPosition.camera(withLatitude: self.latitude, longitude: self.longitude, zoom: 6.0)
-            let mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
-            mapView.delegate = self
-            self.view = mapView
-        //}
-        ref = FIRDatabase.database().reference()
+    
+    
+    //MARK: - Load
+    override func loadView() {
+        //initalizeMapUI
+        let defaults = UserDefaults.standard
+        let lat = defaults.double(forKey: "latitudeDefault")
+        let long = defaults.double(forKey: "longitudeDefault")
+        print(lat)
+        print(long)
+        var zoom = 6.0
+        if lat != 0.0 && long != 0.0 { //0.0, 0.0 is the middle of the ocean. will never have a school there
+            self.latitudeDefault = lat
+            self.longitudeDefault = long
+            zoom = 15.0
+        }
+        let camera = GMSCameraPosition.camera(withLatitude: self.latitudeDefault, longitude: self.longitudeDefault, zoom: Float(zoom))
+        let mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
+        mapView.delegate = self
+        self.view = mapView
+        navigationController?.delegate = self
+        loadMarkers()
         
-        ref?.child(school_database_reference!).child("lat").observeSingleEvent(of: .value, with: {(snap) in
-            print("reading school coordinates")
-            if snap.exists(){
-                    print(snap)
-                    //self.longitude = (snap.childSnapshot(forPath: "latitude").value as? Double)!
-                    self.latitude = snap.value as! Double
-                
-                self.ref?.child(self.school_database_reference!).child("lng").observeSingleEvent(of: .value, with: {(snap2) in
-                    print("reading school coordinates")
-                    if snap2.exists(){
-                        self.longitude = snap2.value as! Double
-                        //self.latitude = (snap.childSnapshot(forPath: "longitude").value as? Double)!
+    }
+    
+    func loadMarkers() {
+        let schoolLatDatabaseReference = FIRDatabase.database().reference().child("schools").child((student?.schoolDatabaseId)!).child("lat")
+        let schoolLongDatabaseReference = FIRDatabase.database().reference().child("schools").child((student?.schoolDatabaseId)!).child("lng")
+        
+        schoolLatDatabaseReference.observeSingleEvent(of: .value, with: {(latSnap) in
+            if latSnap.exists(){
+                self.latitudeDefault = latSnap.value as! Double
+                let defaults = UserDefaults.standard
+                defaults.set(self.latitudeDefault, forKey: "latitudeDefault")
+                schoolLongDatabaseReference.observeSingleEvent(of: .value, with: {(lngSnap) in
+                    if lngSnap.exists(){
+                        self.longitudeDefault = lngSnap.value as! Double
+                        defaults.set(self.longitudeDefault, forKey: "longitudeDefault")
                     }
                 })
             }
             else{
-                print("incorrect school")
+                print("Error getting school coordinates")
             }
             
-            self.ref?.child(self.school_database_reference!).child("routes").observeSingleEvent(of: .value, with: { (snap3) in
-                for item in snap3.children.allObjects {
-                    self.ref?.child("routes").child((item as AnyObject).key).child("location").observeSingleEvent(of: .value, with: {(snap4) in
-                        if snap4.exists(){
-                            let route_lat = snap4.childSnapshot(forPath: "lat").value as! Double
-                            let route_long = snap4.childSnapshot(forPath: "lng").value as! Double
-                            print(route_lat)
-                            print(route_long)
-                            let marker = GMSMarker()
-                            marker.position = CLLocationCoordinate2D(latitude: route_lat, longitude: route_long)
-                            marker.map = (self.view as! GMSMapView)
-                            /*if (self.student?.schedule_dictionary_coordinates[self.time!]?[0] == route_lat && self.student?.schedule_dictionary_coordinates[self.time!]?[1] == route_long ) {
-                                self.currentMarker = marker
-                                marker.icon = GMSMarker.markerImage(with: .black)
-                            } else {
-                                marker.icon = GMSMarker.markerImage(with: .red)
-                            } */
-                            marker.userData = (item as AnyObject).key as String!
+            self.loadRouteMarkers()
+        })
+
+        
+    }
+    
+    func loadMap(lat: Double, long:Double, zoom: Double) {
+        
+    }
+    
+    func loadRouteMarkers() {
+        let databaseReference =  FIRDatabase.database().reference().child("schools").child((student?.schoolDatabaseId)!).child("routes")
+
+        databaseReference.observeSingleEvent(of: .value, with: { (routesSnap) in
+            if (routesSnap.exists()) {
+                for route in routesSnap.children.allObjects {
+                    let routeDatabaseReference = FIRDatabase.database().reference().child("routes").child((route as AnyObject).key).child("location")
+                    routeDatabaseReference.observeSingleEvent(of: .value, with: {(routeSnap) in
+                        if routeSnap.exists(){
+                            let routeLat = routeSnap.childSnapshot(forPath: "lat").value as! Double
+                            let routeLong = routeSnap.childSnapshot(forPath: "lng").value as! Double
+                            let routeKey = (route as AnyObject).key as String
+                            self.loadRouteName(routeKey: routeKey)
+                            self.loadMarkerOnUi(lat: routeLat, long: routeLong, title: "", userData: routeKey)
                         }
                     })
                 }
-            })
-            
-            
-            DispatchQueue.main.async() {
-                // update some UI
-                let marker = GMSMarker()
-                marker.position = CLLocationCoordinate2D(latitude: self.latitude, longitude: self.longitude)
-                CATransaction.begin()
-                CATransaction.setValue(2.0, forKey: kCATransactionAnimationDuration)
-                let newcamera = GMSCameraPosition.camera(withLatitude: self.latitude, longitude: self.longitude, zoom: 15.0)
-                (self.view as! GMSMapView).animate(to: newcamera)
-                marker.map = (self.view as! GMSMapView)
-                marker.icon = GMSMarker.markerImage(with: .green)
-                marker.userData = "school_marker"
-                CATransaction.commit()
+                //draw the school on the map
+                 self.loadMap()
+            } else {
+                //draw school on map anyways
+                self.loadMap()
             }
-            
         })
-    
+
+
+    }
+    func loadRouteName(routeKey:String){
+        let nameDatabaseReference = FIRDatabase.database().reference().child("routes").child(routeKey).child("name")
+        nameDatabaseReference.observeSingleEvent(of: .value, with: { (routeNameSnap) in
+            if (routeNameSnap.exists()) {
+                let routeName = routeNameSnap.value as! String
+                self.markerRouteKeyMapping[routeKey]?.title = routeName
+                
+            }
+        })
+        
+    }
+    func loadMap() {
+        DispatchQueue.main.async() {
+            self.loadMarkerOnUi(lat: self.latitudeDefault, long: self.longitudeDefault, title: "school", userData: "")
+            CATransaction.begin()
+            CATransaction.setValue(2.0, forKey: kCATransactionAnimationDuration)
+            let newcamera = GMSCameraPosition.camera(withLatitude: self.latitudeDefault, longitude: self.longitudeDefault, zoom: 15.0)
+            (self.view as! GMSMapView).animate(to: newcamera)
+            CATransaction.commit()
+        }
     }
     
-    override func didMove(toParentViewController parent: UIViewController?) {
+    func loadMarkerOnUi(lat: Double, long: Double, title:String, userData:String) {
+        let marker = GMSMarker()
+        marker.position = CLLocationCoordinate2D(latitude: lat, longitude: long)
+        marker.map = (self.view as! GMSMapView)
+        marker.title = title
+        marker.userData = userData
+        markerRouteKeyMapping[userData] = marker
         
-        if let destinationNavigationController = parent as? UINavigationController {
-        let targetController = destinationNavigationController.topViewController
-        if let editStudentTableViewController = targetController as? EditStudentTableViewController {
-            editStudentTableViewController.student = self.student
-        }
+        if (title == "school") {
+            marker.icon = GMSMarker.markerImage(with: .green)
         } else {
-            if let editStudentTableViewController = parent as? EditStudentTableViewController {
-                print("hfedskughvksfhlxcv")
-                editStudentTableViewController.student = self.student
+            let checkTimeInSchedule = student?.schedule[time!]
+            if checkTimeInSchedule?[0] == userData {
+                marker.icon = GMSMarker.markerImage(with: .red)
+                self.currentMarker = marker
+                
+                
+            } else {
+                marker.icon = GMSMarker.markerImage(with: .black)
             }
         }
         
     }
     
+    //MARK: - MapView delegate
     func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
-                if marker.userData as! String != "school_marker" {
-                    if(currentMarker != nil) {
-                        currentMarker?.icon = GMSMarker.markerImage(with: .red)
-                    }
+        if marker.title != "school" {
+            if(currentMarker != nil) {
+                currentMarker?.icon = GMSMarker.markerImage(with: .black)
+                if (currentMarker?.userData as! String == marker.userData as! String) { //deselect current marker by tapping on it
                     marker.icon = GMSMarker.markerImage(with: .black)
-                    currentMarker = marker
+                    currentMarker = nil
                 }
+            } else {
+                marker.icon = GMSMarker.markerImage(with: .red)
+                currentMarker = marker
+            }
+        }
         return true
     }
     
+    // MARK: - Navigation
     
-    override func viewWillDisappear(_ animated: Bool) {
-        print("Saving updated parent...")
-        if(currentMarker != nil){
-        print(currentMarker?.userData as! String)
-    
-        self.ref?.child("/routes/").child(currentMarker?.userData as! String).child("students/").child(time!).child((student?.studentDatabaseId)!).setValue(student?.name)
-        print("one fin")
-        //self.ref?.child("students/").child((student?.database_pointer)!).child("/routes/").child(time!).setValue(currentMarker?.userData  as! String)
-        print("fin all")
+    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+        if let controller = viewController as? EditStudentTableViewController {
+            print("Sending updated student object back...")
+            if (currentMarker == nil) { //route has been cleared
+                student?.schedule[time!]?[1] = "" //name
+                student?.schedule[time!]?[0] = "" //dbkey
+            } else {
+                student?.schedule[time!]?[1] = (currentMarker?.title!)! //name
+                student?.schedule[time!]?[0] = currentMarker?.userData as! String //dbkey
+            }
+            controller.student = self.student
         }
     }
-}
 
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destinationViewController.
-     // Pass the selected object to the new view controller.
-     }
-     */
+}

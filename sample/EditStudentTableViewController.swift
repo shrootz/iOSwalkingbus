@@ -89,6 +89,10 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         loadStudentSchedule()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        self.reloadRoutes()
+    }
+    
     func loadStudentSchedule(){
         if let schedule = student?.schedule {
             for time in (schedule.keys) {
@@ -128,7 +132,6 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             
             //set picker to correct school
             schoolSelectedForUI = student.schoolName
-            print(schoolNamesForUI)
             let row = schoolNamesForUI.index(of: schoolSelectedForUI)
             schoolPicker.selectRow(row!, inComponent: 0, animated: false)
             reloadRoutes()
@@ -136,6 +139,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     }
     
     func reloadRoutes() {
+        print("Reloading routes")
         if let student = self.student {
             if let routeInfo = student.schedule["mon_am"]{
                 if (routeInfo[1] == "") {
@@ -308,14 +312,19 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         //delete from old routes
         for (time, routeInfo) in oldRoutes {
             if routeInfo[0] != ""{
-                FIRDatabase.database().reference().child("routes").child(routeInfo[0]).child("students").child((student?.studentDatabaseId)!).removeValue()
+                FIRDatabase.database().reference().child("routes").child(routeInfo[0]).child("students").child(time).child((student?.studentDatabaseId)!).removeValue()
+                
+                FIRDatabase.database().reference().child("students").child((student?.studentDatabaseId)!).child("routes").child(time).removeValue()
             }
         }
         
         //add to new routes
         for (time, routeInfo) in (student?.schedule)! {
             if routeInfo[0] != ""{
-                FIRDatabase.database().reference().child("routes").child(routeInfo[0]).child("students").child((student?.studentDatabaseId)!).setValue("1")
+                
+                FIRDatabase.database().reference().child("routes").child(routeInfo[0]).child("students").child(time).child((student?.studentDatabaseId)!).setValue("1")
+                FIRDatabase.database().reference().child("students").child((student?.studentDatabaseId)!).child("routes").child(time).setValue(routeInfo[0])
+                
             }
         }
         
@@ -332,13 +341,12 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             displayToastMessage(displayText: "Student must have name and school")
             return false
         }
-        var studentSchedule : [String:[String]] = [:]
+        var studentSchedule = self.initSchedule()
         var studentDatabaseId = ""
         if (self.student != nil) {
             studentSchedule = (self.student?.schedule)!
             studentDatabaseId = (self.student?.studentDatabaseId)!
         }
-        print(self.appUser?.schoolsParent)
         let schoolDatabaseId = appUser?.schoolsParent?[schoolSelectedForUI]
         if let updatedStudent = Student(name: name, photo: photo, schoolName: school, info: notes, schedule: studentSchedule, studentDatabaseId: studentDatabaseId, schoolDatabaseId: schoolDatabaseId!) {
             self.student = updatedStudent
@@ -347,6 +355,21 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         
         return false;
 
+    }
+    
+    func initSchedule() -> [String: [String]]{
+        var schedule: [String: [String]] = [:]
+        schedule["mon_am"] = [String](repeating: "", count:2)
+        schedule["mon_pm"] = [String](repeating: "", count:2)
+        schedule["tues_am"] = [String](repeating: "", count:2)
+        schedule["tues_pm"] = [String](repeating: "", count:2)
+        schedule["wed_am"] = [String](repeating: "", count:2)
+        schedule["wed_pm"] = [String](repeating: "", count:2)
+        schedule["thurs_am"] = [String](repeating: "", count:2)
+        schedule["thurs_pm"] = [String](repeating: "", count:2)
+        schedule["fri_am"] = [String](repeating: "", count:2)
+        schedule["fri_pm"] = [String](repeating: "", count:2)
+        return schedule
     }
     
     func updateParentObject() {
@@ -392,88 +415,56 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             }
         }
             
-        /*else if sender as AnyObject? === monday_am {
+        else if sender as AnyObject? === monday_am {
             let mapViewController = segue.destination as! MapViewController
-            //print("\(school_name.text!)")
-            mapViewController.school_database_reference = "schools/" + schools[valueSelected]!
             mapViewController.student = self.student
             mapViewController.time = "mon_am"
         }
-        
         else if sender as AnyObject? === monday_pm {
             let mapViewController = segue.destination as! MapViewController
-            //print("\(school_name.text!)")
-            mapViewController.school_database_reference = "schools/" + schools[valueSelected]!
             mapViewController.student = self.student
             mapViewController.time = "mon_pm"
         }
-        
-         
-        else if sender as AnyObject? === monday_pm {
-            let mapViewController = segue.destination as! MapViewController
-            if let val = coordinates["monday_pm"]{
-                mapViewController.latitude = val[0]
-                mapViewController.longitude = val[1]
-            }
-            
-        }
         else if sender as AnyObject? === tuesday_am {
             let mapViewController = segue.destination as! MapViewController
-            if let val = coordinates["tuesday_am"]{
-                mapViewController.latitude = val[0]
-                mapViewController.longitude = val[1]
-            }
+            mapViewController.student = self.student
+            mapViewController.time = "tues_am"
         }
         else if sender as AnyObject? === tuesday_pm {
             let mapViewController = segue.destination as! MapViewController
-            if let val = coordinates["tuesday_pm"]{
-                mapViewController.latitude = val[0]
-                mapViewController.longitude = val[1]
-            }
+            mapViewController.student = self.student
+            mapViewController.time = "tues_pm"
         }
         else if sender as AnyObject? === wednesday_am {
             let mapViewController = segue.destination as! MapViewController
-            if let val = coordinates["wednesday_am"]{
-                mapViewController.latitude = val[0]
-                mapViewController.longitude = val[1]
-            }
+            mapViewController.student = self.student
+            mapViewController.time = "wed_am"
         }
         else if sender as AnyObject? === wednesday_pm {
             let mapViewController = segue.destination as! MapViewController
-            if let val = coordinates["wednesday_pm"]{
-                mapViewController.latitude = val[0]
-                mapViewController.longitude = val[1]
-            }
+            mapViewController.student = self.student
+            mapViewController.time = "wed_pm"
         }
         else if sender as AnyObject? === thursday_am {
             let mapViewController = segue.destination as! MapViewController
-            if let val = coordinates["thursday_am"]{
-                mapViewController.latitude = val[0]
-                mapViewController.longitude = val[1]
-            }
+            mapViewController.student = self.student
+            mapViewController.time = "thurs_am"
         }
         else if sender as AnyObject? === thursday_pm {
             let mapViewController = segue.destination as! MapViewController
-            if let val = coordinates["thursday_pm"]{
-                mapViewController.latitude = val[0]
-                mapViewController.longitude = val[1]
-            }
+            mapViewController.student = self.student
+            mapViewController.time = "thurs_pm"
         }
         else if sender as AnyObject? === friday_am {
             let mapViewController = segue.destination as! MapViewController
-            if let val = coordinates["friday_am"]{
-                mapViewController.latitude = val[0]
-                mapViewController.longitude = val[1]
-            }
+            mapViewController.student = self.student
+            mapViewController.time = "fri_am"
         }
         else if sender as AnyObject? === friday_pm {
             let mapViewController = segue.destination as! MapViewController
-            if let val = coordinates["friday_pm"]{
-                mapViewController.latitude = val[0]
-                mapViewController.longitude = val[1]
-            }
+            mapViewController.student = self.student
+            mapViewController.time = "fri_pm"
         }
-        */
     }
     
     
@@ -488,15 +479,6 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         navigationItem.title = textField.text
     }
 
-    
-    @IBAction func unwindToEditStudent(sender: UIStoryboardSegue) {
-        print("FUCKIN HELL part 1")
-        if let sourceViewController = sender.source as? MapViewController, let student = sourceViewController.student {
-                self.student = student
-                print("FUCKIN HELL")
-            }
-    }
-    
 }
 
 

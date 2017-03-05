@@ -34,7 +34,7 @@ class StudentTableViewController: UITableViewController {
                 }
                 
                 //set up schedule dictionary for student
-                var schedule: [String: [String]] = [:]
+                var schedule = self.initSchedule()
                 let routes = (studentDetailsSnap.childSnapshot(forPath: "routes").value as? [String:String])
                 if routes != nil {
                     for route in (studentDetailsSnap.childSnapshot(forPath: "routes").value as? [String:String])! {
@@ -57,6 +57,21 @@ class StudentTableViewController: UITableViewController {
             })
         }
         
+    }
+    
+    func initSchedule() -> [String: [String]]{
+        var schedule: [String: [String]] = [:]
+        schedule["mon_am"] = [String](repeating: "", count:2)
+        schedule["mon_pm"] = [String](repeating: "", count:2)
+        schedule["tues_am"] = [String](repeating: "", count:2)
+        schedule["tues_pm"] = [String](repeating: "", count:2)
+        schedule["wed_am"] = [String](repeating: "", count:2)
+        schedule["wed_pm"] = [String](repeating: "", count:2)
+        schedule["thurs_am"] = [String](repeating: "", count:2)
+        schedule["thurs_pm"] = [String](repeating: "", count:2)
+        schedule["fri_am"] = [String](repeating: "", count:2)
+        schedule["fri_pm"] = [String](repeating: "", count:2)
+        return schedule
     }
     
     func loadStudentPhoto(withLocation: String, forStudent:String) {
@@ -89,7 +104,7 @@ class StudentTableViewController: UITableViewController {
     
     // MARK: - Functions 
     
-    //FIXME: I donut actually werk
+    //FIXME: maybe? I think I work now
     func deleteStudentFromDatabase(student: Student) {
         let databaseReference = FIRDatabase.database().reference()
         //delete from routes
