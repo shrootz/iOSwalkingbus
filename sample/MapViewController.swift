@@ -26,7 +26,18 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
     //MARK: - Load
     override func loadView() {
         //initalizeMapUI
-        let camera = GMSCameraPosition.camera(withLatitude: self.latitudeDefault, longitude: self.longitudeDefault, zoom: 6.0)
+        let defaults = UserDefaults.standard
+        let lat = defaults.double(forKey: "latitudeDefault")
+        let long = defaults.double(forKey: "longitudeDefault")
+        print(lat)
+        print(long)
+        var zoom = 6.0
+        if lat != 0.0 && long != 0.0 { //0.0, 0.0 is the middle of the ocean. will never have a school there
+            self.latitudeDefault = lat
+            self.longitudeDefault = long
+            zoom = 15.0
+        }
+        let camera = GMSCameraPosition.camera(withLatitude: self.latitudeDefault, longitude: self.longitudeDefault, zoom: Float(zoom))
         let mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
         mapView.delegate = self
         self.view = mapView
@@ -42,9 +53,12 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
         schoolLatDatabaseReference.observeSingleEvent(of: .value, with: {(latSnap) in
             if latSnap.exists(){
                 self.latitudeDefault = latSnap.value as! Double
+                let defaults = UserDefaults.standard
+                defaults.set(self.latitudeDefault, forKey: "latitudeDefault")
                 schoolLongDatabaseReference.observeSingleEvent(of: .value, with: {(lngSnap) in
                     if lngSnap.exists(){
                         self.longitudeDefault = lngSnap.value as! Double
+                        defaults.set(self.longitudeDefault, forKey: "longitudeDefault")
                     }
                 })
             }
@@ -164,7 +178,6 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
                 student?.schedule[time!]?[1] = (currentMarker?.title!)! //name
                 student?.schedule[time!]?[0] = currentMarker?.userData as! String //dbkey
             }
-            print(self.student?.schedule)
             controller.student = self.student
         }
     }
