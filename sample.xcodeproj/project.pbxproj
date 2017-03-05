@@ -253,6 +253,7 @@
 				TargetAttributes = {
 					D08A0AB41DC18F2500EECEA1 = {
 						CreatedOnToolsVersion = 8.0;
+						DevelopmentTeam = 7AY8H792Y8;
 						ProvisioningStyle = Automatic;
 					};
 					D08A0AC81DC18F2500EECEA1 = {
@@ -532,6 +533,7 @@
 			baseConfigurationReference = 8A89C18B356D0459020FC955 /* Pods-sample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 7AY8H792Y8;
 				INFOPLIST_FILE = sample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = seniordesign.sample;
@@ -546,6 +548,7 @@
 			baseConfigurationReference = 2FD50E961D5EB43824A81CA5 /* Pods-sample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 7AY8H792Y8;
 				INFOPLIST_FILE = sample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = seniordesign.sample;

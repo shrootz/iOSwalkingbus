@@ -6,6 +6,7 @@
 //  Copyright © 2017 seniordesign. All rights reserved.
 //
 
+import CoreBluetooth
 import UIKit
 import os.log
 import Firebase
@@ -18,6 +19,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     @IBOutlet weak var student_notes: UITextField!
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var schoolPicker: UIPickerView!
+    @IBOutlet weak var bluetoothButton: UIButton!
     @IBOutlet weak var monday_am: UIButton!
     @IBOutlet weak var monday_pm: UIButton!
     @IBOutlet weak var tuesday_am: UIButton!
@@ -37,7 +39,11 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     var schoolSelectedForUI = ""
     var oldSchool = ""
     var oldRoutes: [String:[String]] = [:]
-
+    var centralManager: CBCentralManager?
+    var peripherals = Array<CBPeripheral>()
+    var expectedTags = Array<String>()
+    var MACAddress = ""
+    
     // MARK: UIImagePickerControllerDelegate
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController){
@@ -75,9 +81,12 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     //MARK: - Load
     override func viewDidLoad() {
         super.viewDidLoad()
+        //Initialise CoreBluetooth Central Manager
+        centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
+        //expectedTags.append("CB4C2E61-FEF3-47FF-8AEC-67A9B883016C")
+        expectedTags.append("WalkingBus")
         loadUI()
         loadStudentSchedule()
-   
     }
     
     func loadStudentSchedule(){
@@ -254,6 +263,10 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         }, completion: nil)
     }
     
+    @IBAction func lookForBluetooth(_ sender: Any) {
+        self.startScanning()
+    }
+    
     func saveStudentToDatabase(){
         let parentArray: [String: String] =  [(self.appUser?.userAuthId)! : (self.appUser?.userAuthId)!]
         let studentInFirebase = FIRDatabase.database().reference().child("students").child((student?.studentDatabaseId)!)
@@ -262,7 +275,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             "name": student?.name,
             "school": student?.schoolDatabaseId,
             "info": student?.info,
-            "bluetooth":"11:11:11:11:11:11",
+            "bluetooth":MACAddress,
             "status":"waiting",
             "parents":parentArray
             ])
@@ -485,3 +498,47 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     }
     
 }
+
+
+extension EditStudentTableViewController: CBCentralManagerDelegate {
+    func startScanning(){
+        let scanPeriod = 5
+        displayToastMessage(displayText: "Device not found")
+        self.centralManager?.scanForPeripherals(withServices : nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
+        self.perform(#selector(stopScanning), with: self, afterDelay: Double(scanPeriod))
+    }
+    
+    func stopScanning(){
+        if(peripherals.count != 1){
+            startScanning()
+        }
+        else{
+            bluetoothButton.setTitle(MACAddress, for: .normal)
+        }
+    }
+    
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        if (central.state != .poweredOn){
+            displayToastMessage(displayText: "Phone BLE is not turned on")
+        }
+    }
+    
+    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+        if let pName = peripheral.name{
+            if(expectedTags.contains(pName) && !peripherals.contains(peripheral)){
+                print("\nNew expected tag found! \(peripheral)")
+                peripherals.append(peripheral)
+                if let manufacturerData = advertisementData["kCBAdvDataManufacturerData"] as? Data{
+                    assert(manufacturerData.count>=7)
+                    //6 byte MAC address
+                    MACAddress = String(format: "%02X", manufacturerData[2])
+                    for i in 3...7  {
+                        MACAddress += ":"
+                        MACAddress += String(format: "%02X", manufacturerData[i])
+                    }
+                }
+            }
+        }
+    }
+}
+

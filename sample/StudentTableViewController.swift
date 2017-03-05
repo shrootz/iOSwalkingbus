@@ -107,7 +107,6 @@ class StudentTableViewController: UITableViewController {
         
         //delete from parents 
         databaseReference.child("users").child((appUser?.userAuthId)!).child("students").child(student.studentDatabaseId).removeValue()
-
     }
     
     // MARK: - Table view data source

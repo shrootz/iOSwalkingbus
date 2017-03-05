@@ -226,7 +226,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="IXp-5E-xud">
-                                                    <rect key="frame" x="16" y="15" width="343" height="487.5"/>
+                                                    <rect key="frame" x="16" y="0.0" width="343" height="517.5"/>
                                                     <subviews>
                                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="cjR-28-gew">
                                                             <rect key="frame" x="0.0" y="0.0" width="201" height="150"/>
@@ -264,29 +264,37 @@
                                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                             <textInputTraits key="textInputTraits"/>
                                                         </textField>
+                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nCx-4j-Lja">
+                                                            <rect key="frame" x="0.0" y="200.5" width="343" height="30"/>
+                                                            <state key="normal" title="Pair with New Device"/>
+                                                            <connections>
+                                                                <action selector="lookForBluetooth:" destination="Kmd-Nf-26N" eventType="touchUpInside" id="ln0-5Q-FGC"/>
+                                                            </connections>
+                                                        </button>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="School Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X11-Cg-x73">
-                                                            <rect key="frame" x="0.0" y="200.5" width="102" height="20.5"/>
+                                                            <rect key="frame" x="0.0" y="230.5" width="102" height="20.5"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vYY-rF-A1Y">
-                                                            <rect key="frame" x="0.0" y="221" width="320" height="216"/>
+                                                            <rect key="frame" x="0.0" y="251" width="320" height="216"/>
                                                         </pickerView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Info" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sUD-ag-7xH">
-                                                            <rect key="frame" x="0.0" y="437" width="29" height="20.5"/>
+                                                            <rect key="frame" x="0.0" y="467" width="29" height="20.5"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Iq4-gU-vH4">
-                                                            <rect key="frame" x="0.0" y="457.5" width="343" height="30"/>
+                                                            <rect key="frame" x="0.0" y="487.5" width="343" height="30"/>
                                                             <nil key="textColor"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                             <textInputTraits key="textInputTraits"/>
                                                         </textField>
                                                     </subviews>
                                                     <constraints>
+                                                        <constraint firstItem="nCx-4j-Lja" firstAttribute="centerX" secondItem="IXp-5E-xud" secondAttribute="centerX" id="8CA-8e-v79"/>
                                                         <constraint firstItem="Iq4-gU-vH4" firstAttribute="leading" secondItem="IXp-5E-xud" secondAttribute="leading" identifier="id5" id="HAF-Dk-5Dr"/>
                                                         <constraint firstItem="umc-MC-oFi" firstAttribute="leading" secondItem="IXp-5E-xud" secondAttribute="leading" identifier="id1" id="M9i-NM-ixI"/>
                                                         <constraint firstAttribute="trailing" secondItem="Iq4-gU-vH4" secondAttribute="trailing" identifier="id6" id="OwH-AB-Day"/>
@@ -711,6 +719,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="bluetoothButton" destination="nCx-4j-Lja" id="vmT-Qb-UkU"/>
                         <outlet property="friday_am" destination="qyY-c8-Pei" id="z12-aN-kuK"/>
                         <outlet property="friday_pm" destination="ZyS-kT-R2S" id="Umq-Qo-XhL"/>
                         <outlet property="full_name" destination="umc-MC-oFi" id="tFf-EX-Pwf"/>
