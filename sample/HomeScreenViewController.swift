@@ -93,7 +93,13 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
                 if let studentsDict = userSnap.childSnapshot(forPath: "students").value as? [String:String] {
                     students = Array(studentsDict.keys)
                 }
-                schoolsParent = (userSnap.childSnapshot(forPath: "schools_parent").value as? [String:String])!
+                let reversedSchoolsParent = (userSnap.childSnapshot(forPath: "schools_parent").value as? [String:String])
+                if reversedSchoolsParent != nil {
+                    for (key, val) in reversedSchoolsParent! {
+                        schoolsParent[val] = key
+                    }
+                }
+                
             } else {
                 print("Adding user to database...")
                 userName = user.displayName ?? ""
@@ -133,6 +139,13 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
             }
         }
         // TODO: Add entrance to chaperone mode
+    }
+    
+    @IBAction func unwindToHomeScreen(sender: UIStoryboardSegue) {
+        if let sourceViewController = sender.source as? StudentTableViewController, let appUser = sourceViewController.appUser {
+            self.appUser = appUser
+            print(appUser)
+        }
     }
 
 

@@ -29,7 +29,7 @@ class Student {
         self.schedule = schedule
         self.studentDatabaseId = studentDatabaseId
         self.schoolDatabaseId = schoolDatabaseId
-        if name.isEmpty {
+        if name.isEmpty && schoolName.isEmpty {
             return nil
         }
     }

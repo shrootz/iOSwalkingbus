@@ -22,27 +22,29 @@ class StudentTableViewController: UITableViewController {
         for studentKey in (appUser?.students)! {
             FIRDatabase.database().reference().child("/students/").child(studentKey).observeSingleEvent(of: .value, with: { (studentDetailsSnap) in
                 let student_name = studentDetailsSnap.childSnapshot(forPath: "name").value as? String
-                let student_notes = studentDetailsSnap.childSnapshot(forPath: "info").value as? String
-                let student_school = studentDetailsSnap.childSnapshot(forPath: "school").value as? String
-                let school_name = self.appUser?.schoolsParent?[student_school!]
+                let student_notes = studentDetailsSnap.childSnapshot(forPath: "info").value as? String ?? ""
+                let student_school = studentDetailsSnap.childSnapshot(forPath: "school").value as? String ?? ""
+                var school_name = ""
+                if self.appUser?.schoolsParent != nil {
+                    for (key, val) in (self.appUser?.schoolsParent)!{
+                        if(val == student_school) {
+                            school_name = key
+                        }
+                    }
+                }
                 
                 //set up schedule dictionary for student
                 var schedule: [String: [String]] = [:]
-                for route in (studentDetailsSnap.childSnapshot(forPath: "routes").value as? [String:String])! {
-                    schedule[route.key] = [String](repeating: "", count:2)
-                    schedule[route.key]?[0] = route.value
+                let routes = (studentDetailsSnap.childSnapshot(forPath: "routes").value as? [String:String])
+                if routes != nil {
+                    for route in (studentDetailsSnap.childSnapshot(forPath: "routes").value as? [String:String])! {
+                        schedule[route.key] = [String](repeating: "", count:2)
+                        schedule[route.key]?[0] = route.value
+                    }
                 }
                 
                 //create local student object
-                print(student_name!)
-                print(student_notes!)
-                print(schedule)
-                print(studentKey)
-                print(student_school!)
-                print(self.appUser?.schoolsParent!)
-                print(school_name!)
-
-                let myStudent = Student(name: student_name!, photo: UIImage(named:"DefaultImage"), schoolName:school_name!, info:student_notes!, schedule:schedule, studentDatabaseId:studentKey, schoolDatabaseId:student_school!)!
+                let myStudent = Student(name: student_name!, photo: UIImage(named:"DefaultImage"), schoolName:school_name, info:student_notes, schedule:schedule, studentDatabaseId:studentKey, schoolDatabaseId:student_school)!
                 self.students += [myStudent]
                 if studentDetailsSnap.hasChild("photoUrl"){
                     let photoLocation = "\(studentKey)/\("photoUrl")"
@@ -77,9 +79,7 @@ class StudentTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         loadStudents()
-        
     }
     
     override func didReceiveMemoryWarning() {
@@ -87,8 +87,30 @@ class StudentTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    // MARK: - Table view data source
+    // MARK: - Functions 
     
+    //FIXME: I donut actually werk
+    func deleteStudentFromDatabase(student: Student) {
+        let databaseReference = FIRDatabase.database().reference()
+        //delete from routes
+        for (time, route) in student.schedule {
+            if route[0] != "" {
+                databaseReference.child(route[0]).child("students").child(time).child(student.studentDatabaseId).removeValue()
+            }
+        }
+        //delete from school
+        databaseReference.child("schools").child(student.schoolDatabaseId).child("students").child(student.studentDatabaseId).removeValue()
+        
+        //delete from students node
+        databaseReference.child("students").child(student.studentDatabaseId).removeValue()
+        
+        
+        //delete from parents 
+        databaseReference.child("users").child((appUser?.userAuthId)!).child("students").child(student.studentDatabaseId).removeValue()
+
+    }
+    
+    // MARK: - Table view data source
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -109,26 +131,6 @@ class StudentTableViewController: UITableViewController {
         return cell
     }
     
-    
-    
-    @IBAction func unwindToStudentList(sender: UIStoryboardSegue) {
-        if let sourceViewController = sender.source as? EditStudentTableViewController, let student = sourceViewController.student {
-            if let selectedIndexPath = tableView.indexPathForSelectedRow {
-                // Update an existing meal.
-                print("Update an existing meal.")
-                students[selectedIndexPath.row] = student
-                tableView.reloadRows(at: [selectedIndexPath], with: .none)
-            }
-            else {
-                // Add a new meal.
-                let newIndexPath = IndexPath(row: students.count, section: 0)
-                students.append(student)
-                tableView.insertRows(at: [newIndexPath], with: .bottom)
-            }
-        }
-    }
-    
-    
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
@@ -140,27 +142,15 @@ class StudentTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             // Delete the row from the data source
+            let student = students[indexPath.row]
             students.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
+            
+            //remove student from database
+            print("Removing student " + student.name + " from database")
+            deleteStudentFromDatabase(student: student)
         }
     }
-    
-    /*
-     // Override to support rearranging the table view.
-     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-     
-     }
-     */
-    
-    /*
-     // Override to support conditional rearranging of the table view.
-     override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-     // Return false if you do not want the item to be re-orderable.
-     return true
-     }
-     */
     
     
     // MARK: - Navigation
@@ -168,6 +158,7 @@ class StudentTableViewController: UITableViewController {
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowDetail" {
+            print("Clicked on edit existing student")
             let studentDetailViewController = segue.destination as! EditStudentTableViewController
             
             // Get the cell that generated this segue.
@@ -175,27 +166,40 @@ class StudentTableViewController: UITableViewController {
                 let indexPath = tableView.indexPath(for: selectedStudentCell)!
                 let selectedStudent = students[indexPath.row]
                 studentDetailViewController.student = selectedStudent
-                studentDetailViewController.parent_auth_id = self.parentAuthId
+                studentDetailViewController.appUser = self.appUser
+                studentDetailViewController.oldSchool = selectedStudent.schoolDatabaseId
+                studentDetailViewController.oldRoutes = selectedStudent.schedule
             }
         }
         else if segue.identifier == "AddItem" {
-            print("Adding new student.")
+            print("Clicked on adding new student")
             let studentDetailNavController = segue.destination as! UINavigationController
             let studentDetailViewController = studentDetailNavController.topViewController as! EditStudentTableViewController
-            studentDetailViewController.parent_auth_id = self.parentAuthId
+            studentDetailViewController.appUser = self.appUser
         }
     }
     
-    @IBAction func goHome(_ sender: UIBarButtonItem) {
-        // Depending on style of presentation (modal or push presentation), this view controller needs to be dismissed in two different ways.
-        let isPresentingInAddStudentMode = presentingViewController is UINavigationController
-        
-        if isPresentingInAddStudentMode {
-            dismiss(animated: true, completion: nil)
-        }
-        else {
-            navigationController!.popViewController(animated: true)
+    @IBAction func unwindToStudentList(sender: UIStoryboardSegue) {
+        if let sourceViewController = sender.source as? EditStudentTableViewController, let student = sourceViewController.student {
+            if let selectedIndexPath = tableView.indexPathForSelectedRow {
+                print("Updated an existing student.")
+                students[selectedIndexPath.row] = student
+                tableView.reloadRows(at: [selectedIndexPath], with: .none)
+            }
+            else {
+                print("Added a new student")
+                let newIndexPath = IndexPath(row: students.count, section: 0)
+                students.append(student)
+                self.appUser = sourceViewController.appUser
+                tableView.insertRows(at: [newIndexPath], with: .bottom)
+            }
         }
     }
+    
+    @IBAction func unwindToStudentListBack(sender: UIStoryboardSegue) {
+        //do nothing b/c you don't want to update any exsisting data
+        print("Back button pressed from edit student page")
+    }
+
     
 }
