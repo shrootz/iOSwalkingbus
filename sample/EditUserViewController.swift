@@ -146,8 +146,12 @@ class EditUserViewController: UIViewController, UITextFieldDelegate, UIImagePick
         if let controller = viewController as? HomeScreenViewController {
             print("Saving updated user...")
             let userSchoolUpdates = updateSchools()
+            var reverseSchoolUpdates: [String:String] = [:]
+            for (key, val) in userSchoolUpdates { //to get the mapping as key, school name for local object
+                reverseSchoolUpdates[val] = key
+            }
             updateUser(userSchoolUpdates: userSchoolUpdates)
-            self.appUser.update(name: nameField.text,phoneNumber: phoneField.text,email: emailField.text, schoolsParent:userSchoolUpdates)
+            self.appUser.update(name: nameField.text,phoneNumber: phoneField.text,email: emailField.text, schoolsParent:reverseSchoolUpdates)
             controller.appUser = self.appUser
         }
     }
