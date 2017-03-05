@@ -104,7 +104,7 @@ class StudentTableViewController: UITableViewController {
     
     // MARK: - Functions 
     
-    //FIXME: I donut actually werk
+    //FIXME: maybe? I think I work now
     func deleteStudentFromDatabase(student: Student) {
         let databaseReference = FIRDatabase.database().reference()
         //delete from routes

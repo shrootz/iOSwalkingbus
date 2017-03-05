@@ -328,7 +328,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             displayToastMessage(displayText: "Student must have name and school")
             return false
         }
-        var studentSchedule : [String:[String]] = [:]
+        var studentSchedule = self.initSchedule()
         var studentDatabaseId = ""
         if (self.student != nil) {
             studentSchedule = (self.student?.schedule)!
@@ -342,6 +342,21 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         
         return false;
 
+    }
+    
+    func initSchedule() -> [String: [String]]{
+        var schedule: [String: [String]] = [:]
+        schedule["mon_am"] = [String](repeating: "", count:2)
+        schedule["mon_pm"] = [String](repeating: "", count:2)
+        schedule["tues_am"] = [String](repeating: "", count:2)
+        schedule["tues_pm"] = [String](repeating: "", count:2)
+        schedule["wed_am"] = [String](repeating: "", count:2)
+        schedule["wed_pm"] = [String](repeating: "", count:2)
+        schedule["thurs_am"] = [String](repeating: "", count:2)
+        schedule["thurs_pm"] = [String](repeating: "", count:2)
+        schedule["fri_am"] = [String](repeating: "", count:2)
+        schedule["fri_pm"] = [String](repeating: "", count:2)
+        return schedule
     }
     
     func updateParentObject() {
