@@ -124,6 +124,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         let schoolPicker = UIPickerView()
         schoolPicker.delegate = self
         schoolPicker.dataSource = self
+        schoolTextView.inputView = schoolPicker
         if let student = self.student {
             navigationItem.title = student.name
             full_name.text   = student.name
@@ -131,7 +132,6 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             student_image.image = student.photo
             schoolTextView.text = student.schoolName
             //set picker to correct school
-            schoolTextView.inputView = schoolPicker
             let row = schoolNamesForUI.index(of: student.schoolName)
             schoolPicker.selectRow(row!, inComponent: 0, animated: false)
             reloadRoutes()
