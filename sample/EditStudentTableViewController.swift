@@ -124,6 +124,11 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         schoolPicker.delegate = self
         schoolPicker.dataSource = self
         schoolTextView.inputView = schoolPicker
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
+        schoolTextView.addGestureRecognizer(tap)
+        full_name.addGestureRecognizer(tap)
+        student_notes.addGestureRecognizer(tap)
+        
         if let student = self.student {
             navigationItem.title = student.name
             full_name.text   = student.name
@@ -264,6 +269,11 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             toastLabel.alpha = 0.0
             
         }, completion: nil)
+    }
+    
+    func dismissKeyboard() {
+        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+        view.endEditing(true)
     }
     
     @IBAction func lookForBluetooth(_ sender: Any) {
