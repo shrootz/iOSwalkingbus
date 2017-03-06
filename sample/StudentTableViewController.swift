@@ -25,6 +25,7 @@ class StudentTableViewController: UITableViewController {
                 let student_notes = studentDetailsSnap.childSnapshot(forPath: "info").value as? String ?? ""
                 let student_school = studentDetailsSnap.childSnapshot(forPath: "school").value as? String ?? ""
                 let student_bluetooth = studentDetailsSnap.childSnapshot(forPath: "bluetooth").value as? String ?? ""
+                let student_status = studentDetailsSnap.childSnapshot(forPath: "status").value as? String ?? ""
                 var school_name = ""
                 if self.appUser?.schoolsParent != nil {
                     for (key, val) in (self.appUser?.schoolsParent)!{
@@ -45,7 +46,7 @@ class StudentTableViewController: UITableViewController {
                 }
                 
                 //create local student object
-                let myStudent = Student(name: student_name!, photo: UIImage(named:"DefaultImage"), schoolName:school_name, info:student_notes, schedule:schedule, studentDatabaseId:studentKey, schoolDatabaseId:student_school, bluetooth: student_bluetooth)!
+                let myStudent = Student(name: student_name!, photo: UIImage(named:"DefaultImage"), schoolName:school_name, info:student_notes, schedule:schedule, studentDatabaseId:studentKey, schoolDatabaseId:student_school, bluetooth: student_bluetooth, status:student_status)!
                 self.students += [myStudent]
                 if studentDetailsSnap.hasChild("photoUrl"){
                     let photoLocation = "\(studentKey)/\("photoUrl")"
@@ -142,7 +143,7 @@ class StudentTableViewController: UITableViewController {
         cell.nameLabel.text = student.name
         cell.photoImageView.image = student.photo
         cell.schoolLabel.text = student.schoolName
-        cell.chaperoneLabel.text = student.info
+        cell.chaperoneLabel.text = student.status
         return cell
     }
     

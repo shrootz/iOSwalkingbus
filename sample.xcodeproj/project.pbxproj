@@ -25,6 +25,7 @@
 		D08A0AD91DC18F2500EECEA1 /* sampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D08A0AD81DC18F2500EECEA1 /* sampleUITests.swift */; };
 		D09D1EC21E6A2EAB00A3066D /* HomeScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D09D1EC11E6A2EAB00A3066D /* HomeScreenViewController.swift */; };
 		D09D1EC41E6A4EB100A3066D /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = D09D1EC31E6A4EB100A3066D /* User.swift */; };
+		D09D1EC61E6D31C500A3066D /* ChaperoneStudentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D09D1EC51E6D31C500A3066D /* ChaperoneStudentTableViewCell.swift */; };
 		D27AAD422E57B6A1877FA3A7 /* libPods-sample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E970F64C2D1C4A772E9338C8 /* libPods-sample.a */; };
 /* End PBXBuildFile section */
 
@@ -72,6 +73,7 @@
 		D08A0ADA1DC18F2500EECEA1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D09D1EC11E6A2EAB00A3066D /* HomeScreenViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeScreenViewController.swift; sourceTree = "<group>"; };
 		D09D1EC31E6A4EB100A3066D /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		D09D1EC51E6D31C500A3066D /* ChaperoneStudentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChaperoneStudentTableViewCell.swift; sourceTree = "<group>"; };
 		E970F64C2D1C4A772E9338C8 /* libPods-sample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-sample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -160,6 +162,7 @@
 				D07190E01DCC42A700CDF595 /* StudentTableViewCell.swift */,
 				D07190E21DCC46BD00CDF595 /* StudentTableViewController.swift */,
 				D09D1EC31E6A4EB100A3066D /* User.swift */,
+				D09D1EC51E6D31C500A3066D /* ChaperoneStudentTableViewCell.swift */,
 			);
 			path = sample;
 			sourceTree = "<group>";
@@ -378,6 +381,7 @@
 				D07190E31DCC46BD00CDF595 /* StudentTableViewController.swift in Sources */,
 				2064FE591E4BB08400BFBF53 /* ChaperoneTableViewController.swift in Sources */,
 				D09D1EC41E6A4EB100A3066D /* User.swift in Sources */,
+				D09D1EC61E6D31C500A3066D /* ChaperoneStudentTableViewCell.swift in Sources */,
 				D07190E51DCC4B4D00CDF595 /* Student.swift in Sources */,
 				D07190E11DCC42A700CDF595 /* StudentTableViewCell.swift in Sources */,
 			);

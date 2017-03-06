@@ -15,13 +15,14 @@ class Student {
     var info: String
     var photo: UIImage?
     var bluetooth: String
+    var status: String
     var schedule: [String: [String]]
     var studentDatabaseId: String
     var schoolDatabaseId: String
     
     // MARK: Initialization
     
-    init?(name: String, photo: UIImage?, schoolName: String, info: String, schedule: [String: [String]], studentDatabaseId: String, schoolDatabaseId: String, bluetooth: String) {
+    init?(name: String, photo: UIImage?, schoolName: String, info: String, schedule: [String: [String]], studentDatabaseId: String, schoolDatabaseId: String, bluetooth: String, status: String) {
         // Initialize stored properties.
         self.name = name
         self.photo = photo
@@ -34,6 +35,7 @@ class Student {
         if name.isEmpty && schoolName.isEmpty {
             return nil
         }
+        self.status = status
     }
     
 }

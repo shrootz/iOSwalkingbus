@@ -79,6 +79,7 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
         var email = ""
         var phoneNumber = ""
         var photoUrl = ""
+        var routes: String = ""
         var students: [String] = []
         var schoolsParent: [String:String] = [:]
         
@@ -90,6 +91,7 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
                 email = (userSnap.childSnapshot(forPath: "email").value as? String)!
                 photoUrl = (userSnap.childSnapshot(forPath: "photoUrl").value as? String)!
                 phoneNumber = (userSnap.childSnapshot(forPath: "phone").value as? String)!
+                routes = (userSnap.childSnapshot(forPath: "routes").value as? String) ?? ""
                 if let studentsDict = userSnap.childSnapshot(forPath: "students").value as? [String:String] {
                     students = Array(studentsDict.keys)
                 }
@@ -117,7 +119,7 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
                     ])
             }
             
-            self.appUser = User(userAuthId: userAuthId, name: userName, phoneNumber: phoneNumber, email: email, photoUrl: photoUrl, students: students, schoolsParent: schoolsParent)
+            self.appUser = User(userAuthId: userAuthId, name: userName, phoneNumber: phoneNumber, email: email, photoUrl: photoUrl, students: students, schoolsParent: schoolsParent, routes: routes)
     
         })
         
@@ -137,6 +139,10 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
             if let editUserViewController = segue.destination as? EditUserViewController {
                 editUserViewController.appUser = appUser
             }
+        } else if segue.identifier == "enterChaperone" {
+            let chapNavController = segue.destination as! UINavigationController
+            let chapViewController = chapNavController.topViewController as! ChaperoneTableViewController
+            chapViewController.appUser = appUser
         }
         // TODO: Add entrance to chaperone mode
     }
