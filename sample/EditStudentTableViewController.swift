@@ -35,7 +35,6 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     var student: Student?
     var appUser: User?
     var schoolNamesForUI:[String] = []
-    var schoolSelectedForUI = ""
     var oldSchool = ""
     var oldRoutes: [String:[String]] = [:]
     var centralManager: CBCentralManager?
@@ -333,7 +332,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     func updateStudentObject() -> Bool{
         print("Updating the student in the database")
         let name = full_name.text ?? ""
-        let school = schoolSelectedForUI
+        let school = schoolTextView.text ?? ""
         let notes = student_notes.text ?? ""
         let photo = student_image.image
         
@@ -347,7 +346,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             studentSchedule = (self.student?.schedule)!
             studentDatabaseId = (self.student?.studentDatabaseId)!
         }
-        let schoolDatabaseId = appUser?.schoolsParent?[schoolSelectedForUI]
+        let schoolDatabaseId = appUser?.schoolsParent?[school]
         if let updatedStudent = Student(name: name, photo: photo, schoolName: school, info: notes, schedule: studentSchedule, studentDatabaseId: studentDatabaseId, schoolDatabaseId: schoolDatabaseId!) {
             self.student = updatedStudent
             return true;
@@ -386,7 +385,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             print("verifies school and name of child exists")
             if ident == "m_am" || ident == "m_pm" || ident == "t_am" || ident == "t_pm" || ident == "w_am"
                 || ident == "w_pm" || ident == "th_am" || ident == "th_pm" || ident == "f_am" || ident == "f_pm"{
-                if (schoolSelectedForUI.isEmpty) {
+                if (schoolTextView.text?.isEmpty)! {
                     displayToastMessage(displayText: "Select school to pick routes")
                     return false
                 }
@@ -477,6 +476,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     
     func textFieldDidEndEditing(_ textField: UITextField){
         navigationItem.title = textField.text
+        textField.resignFirstResponder()
     }
 
 }
