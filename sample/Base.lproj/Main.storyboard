@@ -205,6 +205,9 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="groupActionButton" destination="HiO-d4-YS7" id="Ora-o5-SMU"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CZb-Df-FAz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

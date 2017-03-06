@@ -684,11 +684,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "sample/ChaperoneTableViewController.swift"
-            timestampString = "510480310.282661"
+            timestampString = "510509840.792577"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "63"
-            endingLineNumber = "63"
+            startingLineNumber = "75"
+            endingLineNumber = "75"
             landmarkName = "loadStudents()"
             landmarkType = "7">
          </BreakpointContent>
@@ -700,11 +700,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "sample/ChaperoneTableViewController.swift"
-            timestampString = "510480310.282661"
+            timestampString = "510509840.792577"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "93"
-            endingLineNumber = "93"
+            startingLineNumber = "105"
+            endingLineNumber = "105"
             landmarkName = "loadSingleStudent(studentKey:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -716,12 +716,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "sample/ChaperoneTableViewController.swift"
-            timestampString = "510480310.282661"
+            timestampString = "510509840.792577"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "200"
-            endingLineNumber = "200"
+            startingLineNumber = "211"
+            endingLineNumber = "211"
             landmarkName = "updateStatus(sender:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "sample/ChaperoneTableViewController.swift"
+            timestampString = "510509840.792577"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "227"
+            endingLineNumber = "227"
+            landmarkName = "updateStatusFromBlueTooth()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
