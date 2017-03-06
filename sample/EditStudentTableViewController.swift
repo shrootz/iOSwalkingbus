@@ -18,7 +18,6 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     @IBOutlet weak var full_name: UITextField!
     @IBOutlet weak var student_notes: UITextField!
     @IBOutlet weak var saveButton: UIBarButtonItem!
-    @IBOutlet weak var schoolPicker: UIPickerView!
     @IBOutlet weak var bluetoothButton: UIButton!
     @IBOutlet weak var monday_am: UIButton!
     @IBOutlet weak var monday_pm: UIButton!
@@ -29,8 +28,8 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     @IBOutlet weak var thursday_am: UIButton!
     @IBOutlet weak var thursday_pm: UIButton!
     @IBOutlet weak var friday_am: UIButton!
-    @IBOutlet weak var friday_pm: UIButton!
-    
+    @IBOutlet weak var friday_pm: UIButton!    
+    @IBOutlet weak var schoolTextView: UITextField!
     
     //MARK: - Variables
     var student: Student?
@@ -122,6 +121,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                 schoolNamesForUI.append(schoolName)
             }
         }
+        let schoolPicker = UIPickerView()
         schoolPicker.delegate = self
         schoolPicker.dataSource = self
         if let student = self.student {
@@ -129,10 +129,10 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             full_name.text   = student.name
             student_notes.text = student.info
             student_image.image = student.photo
-            
+            schoolTextView.text = student.schoolName
             //set picker to correct school
-            schoolSelectedForUI = student.schoolName
-            let row = schoolNamesForUI.index(of: schoolSelectedForUI)
+            schoolTextView.inputView = schoolPicker
+            let row = schoolNamesForUI.index(of: student.schoolName)
             schoolPicker.selectRow(row!, inComponent: 0, animated: false)
             reloadRoutes()
         }
@@ -246,7 +246,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     
     // Catpure the picker view selection
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        schoolSelectedForUI = schoolNamesForUI[row]
+        schoolTextView.text = schoolNamesForUI[row]
     }
     
     // MARK: - Functions

@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="uQb-hd-fuH">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="15G1217" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="uQb-hd-fuH">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -218,15 +218,15 @@
                         <sections>
                             <tableViewSection footerTitle="Schedule" id="5Pc-ne-AIv">
                                 <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="517" id="RB8-3e-4xY">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="517"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="358" id="RB8-3e-4xY">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="358"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="RB8-3e-4xY" id="hEc-r5-Lh4">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="516"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="357"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="IXp-5E-xud">
-                                                    <rect key="frame" x="16" y="0.0" width="343" height="517.5"/>
+                                                <stackView opaque="NO" contentMode="scaleToFill" misplaced="YES" axis="vertical" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="IXp-5E-xud">
+                                                    <rect key="frame" x="16" y="16" width="343" height="332"/>
                                                     <subviews>
                                                         <stackView opaque="NO" contentMode="scaleToFill" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="cjR-28-gew">
                                                             <rect key="frame" x="0.0" y="0.0" width="201" height="150"/>
@@ -277,17 +277,25 @@
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vYY-rF-A1Y">
-                                                            <rect key="frame" x="0.0" y="251" width="320" height="216"/>
-                                                        </pickerView>
+                                                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="WE8-q6-l6b">
+                                                            <rect key="frame" x="0.0" y="251" width="343" height="30"/>
+                                                            <subviews>
+                                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="dUp-dd-fmm">
+                                                                    <rect key="frame" x="0.0" y="0.0" width="343" height="30"/>
+                                                                    <nil key="textColor"/>
+                                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                                    <textInputTraits key="textInputTraits"/>
+                                                                </textField>
+                                                            </subviews>
+                                                        </stackView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Info" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sUD-ag-7xH">
-                                                            <rect key="frame" x="0.0" y="467" width="29" height="20.5"/>
+                                                            <rect key="frame" x="0.0" y="281" width="29" height="20.5"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Iq4-gU-vH4">
-                                                            <rect key="frame" x="0.0" y="487.5" width="343" height="30"/>
+                                                            <rect key="frame" x="0.0" y="301.5" width="343" height="30"/>
                                                             <nil key="textColor"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                             <textInputTraits key="textInputTraits"/>
@@ -299,6 +307,7 @@
                                                         <constraint firstItem="umc-MC-oFi" firstAttribute="leading" secondItem="IXp-5E-xud" secondAttribute="leading" identifier="id1" id="M9i-NM-ixI"/>
                                                         <constraint firstAttribute="trailing" secondItem="Iq4-gU-vH4" secondAttribute="trailing" identifier="id6" id="OwH-AB-Day"/>
                                                         <constraint firstAttribute="trailing" secondItem="umc-MC-oFi" secondAttribute="trailing" identifier="id2" id="cEw-9f-Z0A"/>
+                                                        <constraint firstItem="WE8-q6-l6b" firstAttribute="centerX" secondItem="IXp-5E-xud" secondAttribute="centerX" id="cl2-Gu-Dda"/>
                                                     </constraints>
                                                 </stackView>
                                             </subviews>
@@ -313,7 +322,7 @@
                             <tableViewSection headerTitle="Monday" id="JnJ-WS-QPg">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="HGC-o2-rur">
-                                        <rect key="frame" x="0.0" y="573" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="414" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="HGC-o2-rur" id="HB5-ua-57A">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
@@ -350,7 +359,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="QJG-ua-4Mo">
-                                        <rect key="frame" x="0.0" y="617" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="458" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="QJG-ua-4Mo" id="SaG-74-Poe">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
@@ -391,7 +400,7 @@
                             <tableViewSection headerTitle="Tuesday" id="0X8-et-c9D">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="nQ3-yS-YhV">
-                                        <rect key="frame" x="0.0" y="689" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="530" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nQ3-yS-YhV" id="t6U-lz-DSB">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
@@ -428,7 +437,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="AkI-lO-Pmb">
-                                        <rect key="frame" x="0.0" y="733" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="574" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="AkI-lO-Pmb" id="n3c-ii-ELj">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
@@ -469,7 +478,7 @@
                             <tableViewSection headerTitle="Wednesday" id="BUq-rP-bju">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="fYs-S4-hWs">
-                                        <rect key="frame" x="0.0" y="805" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="646" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="fYs-S4-hWs" id="VUq-kx-orP">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
@@ -506,7 +515,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="Ad6-11-Zo5">
-                                        <rect key="frame" x="0.0" y="849" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="690" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Ad6-11-Zo5" id="gSn-SL-O2d">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
@@ -547,7 +556,7 @@
                             <tableViewSection headerTitle="Thursday" id="bis-JL-kpR">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="K4L-27-G3H">
-                                        <rect key="frame" x="0.0" y="921" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="762" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="K4L-27-G3H" id="jyp-oq-owE">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
@@ -584,7 +593,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="njx-wc-bpo">
-                                        <rect key="frame" x="0.0" y="965" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="806" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="njx-wc-bpo" id="q37-PU-hhv">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
@@ -625,7 +634,7 @@
                             <tableViewSection headerTitle="Friday" id="VQO-zE-SIC">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="FcU-La-ng7">
-                                        <rect key="frame" x="0.0" y="1037" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="878" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="FcU-La-ng7" id="gxb-xC-RMe">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
@@ -662,7 +671,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="ILZ-Eg-VKh">
-                                        <rect key="frame" x="0.0" y="1081" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="922" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ILZ-Eg-VKh" id="W2A-oh-UNe">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
@@ -726,7 +735,7 @@
                         <outlet property="monday_am" destination="a6D-MV-sLH" id="aO0-CW-kkr"/>
                         <outlet property="monday_pm" destination="CSq-eV-WHb" id="QHh-tH-Hny"/>
                         <outlet property="saveButton" destination="AUw-Ds-0Wa" id="g3A-el-RzH"/>
-                        <outlet property="schoolPicker" destination="vYY-rF-A1Y" id="jBh-Af-hNQ"/>
+                        <outlet property="schoolTextView" destination="dUp-dd-fmm" id="4Se-m8-N6w"/>
                         <outlet property="student_image" destination="1LW-4S-4gC" id="5H3-bL-6aC"/>
                         <outlet property="student_notes" destination="Iq4-gU-vH4" id="4zr-QB-3FL"/>
                         <outlet property="thursday_am" destination="1gS-hq-2Qg" id="JAl-0R-gDR"/>
