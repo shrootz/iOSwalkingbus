@@ -18,6 +18,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
     var student: Student?
     var time: String?
     var currentMarker : GMSMarker?
+    var lastMarker : GMSMarker?
     var markerRouteKeyMapping: [String:GMSMarker] = [:] //allows for loading name of route later
     var numTaps = 0
     
@@ -33,7 +34,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
         if lat != 0.0 && long != 0.0 { //0.0, 0.0 is the middle of the ocean. will never have a school there
             self.latitudeDefault = lat
             self.longitudeDefault = long
-            zoom = 15.0
+            zoom = 14.0
         }
         let camera = GMSCameraPosition.camera(withLatitude: self.latitudeDefault, longitude: self.longitudeDefault, zoom: Float(zoom))
         let mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
@@ -132,7 +133,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
             self.loadMarkerOnUi(lat: self.latitudeDefault, long: self.longitudeDefault, title: (self.student?.schoolName)!, userData: "school")
             CATransaction.begin()
             CATransaction.setValue(2.0, forKey: kCATransactionAnimationDuration)
-            let newcamera = GMSCameraPosition.camera(withLatitude: self.latitudeDefault, longitude: self.longitudeDefault, zoom: 15.0)
+            let newcamera = GMSCameraPosition.camera(withLatitude: self.latitudeDefault, longitude: self.longitudeDefault, zoom: 14.0)
             (self.view as! GMSMapView).animate(to: newcamera)
             CATransaction.commit()
         }
@@ -149,11 +150,12 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
         if (userData == "school") {
             marker.icon = GMSMarker.markerImage(with: .green)
         } else {
-            marker.snippet = "Tap Again to Select"
+            marker.snippet = "Tap again to select"
             let checkTimeInSchedule = student?.schedule[time!]
             if checkTimeInSchedule?[0] == userData {
                 marker.icon = GMSMarker.markerImage(with: .red)
                 self.currentMarker = marker
+                marker.snippet = "Tap again to unselect"
                 
                 
             } else {
@@ -167,19 +169,36 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
     func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
         if marker.userData as! String == "school" {
             return false
-        }
-        else if currentMarker == marker && numTaps == 1 { //unselected current marker
+        } else if lastMarker != marker && numTaps == 1 {
+            print("clicked on a different marker")
+            lastMarker = marker
+            return false
+        } else if currentMarker == marker && numTaps == 1 { //unselected current marker
+            print("unselecting marker")
             marker.icon = GMSMarker.markerImage(with: .black)
             currentMarker = nil
+            lastMarker = nil
             numTaps = 0
+            var newSnippet = ""
+            if let components = marker.snippet?.components(separatedBy: "\n"){
+                let numComponents = components.count
+                for i in 0 ... numComponents - 2 {
+                    newSnippet += components[i]
+                    newSnippet += "\n"
+                }
+            }
+            newSnippet += "Tap again to select"
+            marker.snippet = newSnippet
             return false
         } else if currentMarker != marker && numTaps == 1 { //select current marker
+            print("selecting marker")
             marker.icon = GMSMarker.markerImage(with: .red)
+            lastMarker = nil
+            if let changeMarker = currentMarker {
+                changeMarker.icon = GMSMarker.markerImage(with: .black)
+            }
             currentMarker = marker
             numTaps = 0
-            return false
-        } else if currentMarker == marker && numTaps == 0 { //clicked selected marker, TODO: change snippet
-            numTaps = 1
             var newSnippet = ""
             if let components = marker.snippet?.components(separatedBy: "\n"){
                 let numComponents = components.count
@@ -191,18 +210,15 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
             newSnippet += "Tap again to unselect"
             marker.snippet = newSnippet
             return false
-        } else { //clicked a marker for the first time, TODO: change snippet
+        } else if currentMarker == marker && numTaps == 0 { //clicked selected marker
+            print("first click on selected marker")
             numTaps = 1
-            var newSnippet = ""
-            if let components = marker.snippet?.components(separatedBy: "\n"){
-                let numComponents = components.count
-                for i in 0 ... numComponents - 2 {
-                    newSnippet += components[i]
-                    newSnippet += "\n"
-                }
-            }
-            newSnippet += "Tap again to select"
-            marker.snippet = newSnippet
+            lastMarker = marker
+            return false
+        } else { //clicked a marker for the first time
+            print("first click on unselected marker")
+            numTaps = 1
+            lastMarker = marker
             return false
         }
         
