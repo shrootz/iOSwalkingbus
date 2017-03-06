@@ -19,8 +19,8 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
     var time: String?
     var currentMarker : GMSMarker?
     var markerRouteKeyMapping: [String:GMSMarker] = [:] //allows for loading name of route later
+    var numTaps = 0
     
-
     
     
     //MARK: - Load
@@ -29,8 +29,6 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
         let defaults = UserDefaults.standard
         let lat = defaults.double(forKey: "latitudeDefault")
         let long = defaults.double(forKey: "longitudeDefault")
-        print(lat)
-        print(long)
         var zoom = 6.0
         if lat != 0.0 && long != 0.0 { //0.0, 0.0 is the middle of the ocean. will never have a school there
             self.latitudeDefault = lat
@@ -68,7 +66,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
             
             self.loadRouteMarkers()
         })
-
+        
         
     }
     
@@ -78,7 +76,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
     
     func loadRouteMarkers() {
         let databaseReference =  FIRDatabase.database().reference().child("schools").child((student?.schoolDatabaseId)!).child("routes")
-
+        
         databaseReference.observeSingleEvent(of: .value, with: { (routesSnap) in
             if (routesSnap.exists()) {
                 for route in routesSnap.children.allObjects {
@@ -89,19 +87,20 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
                             let routeLong = routeSnap.childSnapshot(forPath: "lng").value as! Double
                             let routeKey = (route as AnyObject).key as String
                             self.loadRouteName(routeKey: routeKey)
+                            self.loadRouteTime(routeKey: routeKey)
                             self.loadMarkerOnUi(lat: routeLat, long: routeLong, title: "", userData: routeKey)
                         }
                     })
                 }
                 //draw the school on the map
-                 self.loadMap()
+                self.loadMap()
             } else {
                 //draw school on map anyways
                 self.loadMap()
             }
         })
-
-
+        
+        
     }
     func loadRouteName(routeKey:String){
         let nameDatabaseReference = FIRDatabase.database().reference().child("routes").child(routeKey).child("name")
@@ -114,9 +113,23 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
         })
         
     }
+    
+    func loadRouteTime(routeKey:String) {
+        let nameDatabaseReference = FIRDatabase.database().reference().child("routes").child(routeKey).child("time")
+        nameDatabaseReference.observeSingleEvent(of: .value, with: { (routeTimeSnap) in
+            if (routeTimeSnap.exists()) {
+                let routeTime = routeTimeSnap.value as! String
+                let originalSnippet = self.markerRouteKeyMapping[routeKey]?.snippet
+                if (self.time?.contains("am"))! {
+                    self.markerRouteKeyMapping[routeKey]?.snippet = "Departs at " + routeTime + "\n" + originalSnippet!
+                }
+                
+            }
+        })
+    }
     func loadMap() {
         DispatchQueue.main.async() {
-            self.loadMarkerOnUi(lat: self.latitudeDefault, long: self.longitudeDefault, title: "school", userData: "")
+            self.loadMarkerOnUi(lat: self.latitudeDefault, long: self.longitudeDefault, title: (self.student?.schoolName)!, userData: "school")
             CATransaction.begin()
             CATransaction.setValue(2.0, forKey: kCATransactionAnimationDuration)
             let newcamera = GMSCameraPosition.camera(withLatitude: self.latitudeDefault, longitude: self.longitudeDefault, zoom: 15.0)
@@ -133,9 +146,10 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
         marker.userData = userData
         markerRouteKeyMapping[userData] = marker
         
-        if (title == "school") {
+        if (userData == "school") {
             marker.icon = GMSMarker.markerImage(with: .green)
         } else {
+            marker.snippet = "Tap Again to Select"
             let checkTimeInSchedule = student?.schedule[time!]
             if checkTimeInSchedule?[0] == userData {
                 marker.icon = GMSMarker.markerImage(with: .red)
@@ -151,19 +165,60 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
     
     //MARK: - MapView delegate
     func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
-        if marker.title != "school" {
-            if(currentMarker != nil) {
-                currentMarker?.icon = GMSMarker.markerImage(with: .black)
-                if (currentMarker?.userData as! String == marker.userData as! String) { //deselect current marker by tapping on it
-                    marker.icon = GMSMarker.markerImage(with: .black)
-                    currentMarker = nil
-                }
-            } else {
-                marker.icon = GMSMarker.markerImage(with: .red)
-                currentMarker = marker
-            }
+        if marker.userData as! String == "school" {
+            return false
         }
-        return true
+        else if currentMarker == marker && numTaps == 1 { //unselected current marker
+            marker.icon = GMSMarker.markerImage(with: .black)
+            currentMarker = nil
+            numTaps = 0
+            return false
+        } else if currentMarker != marker && numTaps == 1 { //select current marker
+            marker.icon = GMSMarker.markerImage(with: .red)
+            currentMarker = marker
+            numTaps = 0
+            return false
+        } else if currentMarker == marker && numTaps == 0 { //clicked selected marker, TODO: change snippet
+            numTaps = 1
+            var newSnippet = ""
+            if let components = marker.snippet?.components(separatedBy: "\n"){
+                let numComponents = components.count
+                for i in 0 ... numComponents - 2 {
+                    newSnippet += components[i]
+                    newSnippet += "\n"
+                }
+            }
+            newSnippet += "Tap again to unselect"
+            marker.snippet = newSnippet
+            return false
+        } else { //clicked a marker for the first time, TODO: change snippet
+            numTaps = 1
+            var newSnippet = ""
+            if let components = marker.snippet?.components(separatedBy: "\n"){
+                let numComponents = components.count
+                for i in 0 ... numComponents - 2 {
+                    newSnippet += components[i]
+                    newSnippet += "\n"
+                }
+            }
+            newSnippet += "Tap again to select"
+            marker.snippet = newSnippet
+            return false
+        }
+        
+        
+    /*if marker.userData as! String != "school" {
+     if(currentMarker != nil) {
+     currentMarker?.icon = GMSMarker.markerImage(with: .black)
+     if (currentMarker?.userData as! String == marker.userData as! String) { //deselect current marker by tapping on it
+     marker.icon = GMSMarker.markerImage(with: .black)
+     currentMarker = nil
+     }
+     } else {
+     marker.icon = GMSMarker.markerImage(with: .red)
+     currentMarker = marker
+     }
+     } */
     }
     
     // MARK: - Navigation
@@ -174,12 +229,12 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
             if (currentMarker == nil) { //route has been cleared
                 student?.schedule[time!]?[1] = "" //name
                 student?.schedule[time!]?[0] = "" //dbkey
-            } else {
+            } else if (currentMarker != nil){
                 student?.schedule[time!]?[1] = (currentMarker?.title!)! //name
                 student?.schedule[time!]?[0] = currentMarker?.userData as! String //dbkey
             }
             controller.student = self.student
         }
     }
-
+    
 }

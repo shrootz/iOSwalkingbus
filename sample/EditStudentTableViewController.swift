@@ -125,9 +125,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         schoolPicker.dataSource = self
         schoolTextView.inputView = schoolPicker
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
-        schoolTextView.addGestureRecognizer(tap)
-        full_name.addGestureRecognizer(tap)
-        student_notes.addGestureRecognizer(tap)
+        view.addGestureRecognizer(tap)
         
         if let student = self.student {
             navigationItem.title = student.name
