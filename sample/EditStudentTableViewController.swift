@@ -40,7 +40,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     var centralManager: CBCentralManager?
     var peripherals = Array<CBPeripheral>()
     var expectedTags = Array<String>()
-    var MACAddress = ""
+    var MACAddress: String = ""
     
     // MARK: UIImagePickerControllerDelegate
     
@@ -124,12 +124,17 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         schoolPicker.delegate = self
         schoolPicker.dataSource = self
         schoolTextView.inputView = schoolPicker
+        bluetoothButton.setTitle("Scan for Device", for: .normal)
         if let student = self.student {
             navigationItem.title = student.name
             full_name.text   = student.name
             student_notes.text = student.info
             student_image.image = student.photo
             schoolTextView.text = student.schoolName
+            MACAddress = student.bluetooth
+            if(MACAddress != ""){
+                bluetoothButton.setTitle("Forget my Device", for: .normal)
+            }
             //set picker to correct school
             let row = schoolNamesForUI.index(of: student.schoolName)
             schoolPicker.selectRow(row!, inComponent: 0, animated: false)
@@ -267,7 +272,14 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     }
     
     @IBAction func lookForBluetooth(_ sender: Any) {
-        self.startScanning()
+        if(bluetoothButton.titleLabel!.text == "Forget my Device"){
+            MACAddress = ""
+            bluetoothButton.setTitle("Scan for New Device", for: .normal)
+        }
+        else{
+            self.displayToastMessage(displayText: "Scanning for a student device")
+            self.startScanning()
+        }
     }
     
     func saveStudentToDatabase(){
@@ -278,7 +290,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             "name": student?.name,
             "school": student?.schoolDatabaseId,
             "info": student?.info,
-            "bluetooth":MACAddress,
+            "bluetooth":student?.bluetooth,
             "status":"waiting",
             "parents":parentArray
             ])
@@ -335,7 +347,8 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         let school = schoolTextView.text ?? ""
         let notes = student_notes.text ?? ""
         let photo = student_image.image
-        
+        let bluetooth = MACAddress
+        print("bluetooth found " + MACAddress)
         if (name == "" || school == "") {
             displayToastMessage(displayText: "Student must have name and school")
             return false
@@ -347,7 +360,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             studentDatabaseId = (self.student?.studentDatabaseId)!
         }
         let schoolDatabaseId = appUser?.schoolsParent?[school]
-        if let updatedStudent = Student(name: name, photo: photo, schoolName: school, info: notes, schedule: studentSchedule, studentDatabaseId: studentDatabaseId, schoolDatabaseId: schoolDatabaseId!) {
+        if let updatedStudent = Student(name: name, photo: photo, schoolName: school, info: notes, schedule: studentSchedule, studentDatabaseId: studentDatabaseId, schoolDatabaseId: schoolDatabaseId!, bluetooth: bluetooth) {
             self.student = updatedStudent
             return true;
         }
@@ -484,18 +497,22 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
 
 extension EditStudentTableViewController: CBCentralManagerDelegate {
     func startScanning(){
-        let scanPeriod = 5
-        displayToastMessage(displayText: "Device not found")
+        let scanPeriod = 10
+        //displayToastMessage(displayText: "Device not found")
         self.centralManager?.scanForPeripherals(withServices : nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
         self.perform(#selector(stopScanning), with: self, afterDelay: Double(scanPeriod))
     }
     
     func stopScanning(){
-        if(peripherals.count != 1){
-            startScanning()
+        if(peripherals.count == 0){
+            displayToastMessage(displayText: "No device found")
+        }
+        else if (peripherals.count == 1){
+            displayToastMessage(displayText: "Device found")
+            bluetoothButton.setTitle("Forget my Device", for: .normal)
         }
         else{
-            bluetoothButton.setTitle(MACAddress, for: .normal)
+            displayToastMessage(displayText: "Too many student devices found")
         }
     }
     

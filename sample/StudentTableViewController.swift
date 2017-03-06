@@ -24,6 +24,7 @@ class StudentTableViewController: UITableViewController {
                 let student_name = studentDetailsSnap.childSnapshot(forPath: "name").value as? String
                 let student_notes = studentDetailsSnap.childSnapshot(forPath: "info").value as? String ?? ""
                 let student_school = studentDetailsSnap.childSnapshot(forPath: "school").value as? String ?? ""
+                let student_bluetooth = studentDetailsSnap.childSnapshot(forPath: "bluetooth").value as? String ?? ""
                 var school_name = ""
                 if self.appUser?.schoolsParent != nil {
                     for (key, val) in (self.appUser?.schoolsParent)!{
@@ -44,7 +45,7 @@ class StudentTableViewController: UITableViewController {
                 }
                 
                 //create local student object
-                let myStudent = Student(name: student_name!, photo: UIImage(named:"DefaultImage"), schoolName:school_name, info:student_notes, schedule:schedule, studentDatabaseId:studentKey, schoolDatabaseId:student_school)!
+                let myStudent = Student(name: student_name!, photo: UIImage(named:"DefaultImage"), schoolName:school_name, info:student_notes, schedule:schedule, studentDatabaseId:studentKey, schoolDatabaseId:student_school, bluetooth: student_bluetooth)!
                 self.students += [myStudent]
                 if studentDetailsSnap.hasChild("photoUrl"){
                     let photoLocation = "\(studentKey)/\("photoUrl")"
