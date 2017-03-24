@@ -18,6 +18,9 @@ class ChaperoneTableViewController: UITableViewController {
     var peripherals = Array<CBPeripheral>()
     var expectedTags = Array<String>()
     var studentsWithChaperone = [String]()
+    var routeDate: Date = Date()
+    var currentTime: String = ""
+    
     @IBOutlet weak var groupActionButton: UIBarButtonItem!
     
     @IBAction func resetStudentStatusButton(_ sender: Any) {
@@ -33,16 +36,33 @@ class ChaperoneTableViewController: UITableViewController {
     @IBAction func groupActionButton(_ sender: UIBarButtonItem) {
         if sender.title == "Leaving" {
             print(studentsWithChaperone)
-            updateStatusFromBlueTooth()
-            for student in students {
-                if (student.status == "waiting") {
-                    student.status = "left behind"
+            let alertTitle = "You are picking up " + String(studentsWithChaperone.count) + " students. " + String(students.count) + " students are registered for this bus."
+            //1. Create the alert controller.
+            let alert = UIAlertController(title: alertTitle, message: "Are you sure you want to leave?", preferredStyle: .alert)
+            
+            //2. Add the text field. You can configure it however you need.
+            //alert.addTextField { (textField) in
+            //    textField.text = ""
+            //}
+            
+            // 3. Grab the value from the text field, and print it when the user clicks OK.
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] (_) in
+                self.updateStatusFromBlueTooth()
+                for student in self.students {
+                    if (student.status == "waiting") {
+                        student.status = "left behind"
+                    }
+                    let databaseReference = FIRDatabase.database().reference().child("students").child(student.studentDatabaseId).child("status")
+                    databaseReference.setValue(student.status)
                 }
-                let databaseReference = FIRDatabase.database().reference().child("students").child(student.studentDatabaseId).child("status")
-                databaseReference.setValue(student.status)
-            }
-            tableView.reloadData()
-            sender.title = "Dropping Off"
+                self.tableView.reloadData()
+                sender.title = "Dropping Off"
+                
+            }))
+            
+            // 4. Present the alert.
+            self.present(alert, animated: true, completion: nil)
+            
         } else if sender.title == "Dropping Off" {
             for student in students {
                 if (student.status == "picked up") {
@@ -58,6 +78,7 @@ class ChaperoneTableViewController: UITableViewController {
     //MARK: - Load
     override func viewDidLoad() {
         super.viewDidLoad()
+        getCurrentTime()
         loadRouteInfo()
         loadStudents()
         //Initialise CoreBluetooth Central Manager
@@ -68,7 +89,18 @@ class ChaperoneTableViewController: UITableViewController {
     
     func loadRouteInfo(){
         print("Loading the route info")
-        //ChaperoneTableViewController.title = ""
+        let currentRoute = appUser?.routes?[0] ?? ""
+        if !(currentRoute.isEmpty){
+            FIRDatabase.database().reference().child("routes").child(currentRoute).child("public").observeSingleEvent(of: .value, with: { (routeDetailsSnap) in
+                self.title = (routeDetailsSnap.childSnapshot(forPath: "name").value as? String)!
+                let isoDate = (routeDetailsSnap.childSnapshot(forPath: "time").value as? String)!
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "HH:mm"
+                dateFormatter.timeZone = TimeZone.current
+                dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+                self.routeDate = dateFormatter.date(from:isoDate)!
+            })
+        }
     }
     
     func loadStudents(){
@@ -76,7 +108,8 @@ class ChaperoneTableViewController: UITableViewController {
         let currentRoute = appUser?.routes?[0] ?? ""
         if !(currentRoute.isEmpty){
             //TODO: find the actual time for the bus
-            FIRDatabase.database().reference().child("routes").child(currentRoute).child("private").child("students").child("mon_am").observeSingleEvent(of: .value, with: { (routeStudentDetailsSnap) in
+            FIRDatabase.database().reference().child("routes").child(currentRoute).child("private")
+                .child("students").child(self.currentTime).observeSingleEvent(of: .value, with: { (routeStudentDetailsSnap) in
                 for student in routeStudentDetailsSnap.children.allObjects{
                     let studentKey = (student as AnyObject).key as String
                     if !studentKey.isEmpty {
@@ -143,8 +176,48 @@ class ChaperoneTableViewController: UITableViewController {
         })
     }
     //MARK: - Functions
+    func getCurrentTime() {
+        let todayDate = Date()
+        //let myCalendar = Calendar.current
+        let myCalendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
+        let myComponents = myCalendar.components(.weekday, from: todayDate)
+        let weekDay = myComponents.weekday
+        let hour = myCalendar.component(.hour, from: todayDate)
+        self.currentTime = getDayOfWeek(dayAsInt: weekDay!, hour: hour)
+        print("I think the current time is " + self.currentTime)
+    }
     
-    
+    func getDayOfWeek(dayAsInt: Int, hour: Int) -> String{
+        var dayAndTime: String = ""
+        if(dayAsInt == 1){
+            return "mon_am"
+        }
+        else if(dayAsInt == 2){
+            dayAndTime = "mon"
+        }
+        else if(dayAsInt == 3){
+            dayAndTime = "tue"
+        }
+        else if(dayAsInt == 4){
+            dayAndTime = "wed"
+        }
+        else if(dayAsInt == 5){
+            dayAndTime = "thu"
+        }
+        else if(dayAsInt == 6){
+            dayAndTime = "fri"
+        }
+        else if(dayAsInt == 7){
+            dayAndTime = "mon_am"
+        }
+        if(hour < 11 || hour > 19){
+            dayAndTime += "_am"
+        }
+        else{
+            dayAndTime += "_pm"
+        }
+        return dayAndTime
+    }
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
