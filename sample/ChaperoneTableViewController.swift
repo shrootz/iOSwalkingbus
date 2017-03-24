@@ -60,6 +60,8 @@ class ChaperoneTableViewController: UITableViewController {
                 
             }))
             
+            alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { [weak alert] (_) in }))
+            
             // 4. Present the alert.
             self.present(alert, animated: true, completion: nil)
             
@@ -89,7 +91,10 @@ class ChaperoneTableViewController: UITableViewController {
     
     func loadRouteInfo(){
         print("Loading the route info")
-        let currentRoute = appUser?.routes?[0] ?? ""
+        var currentRoute = ""
+        if (appUser?.routes) != nil && (appUser?.routes?.count)! > 0{ 
+            currentRoute = appUser?.routes?[0] ?? ""
+        }
         if !(currentRoute.isEmpty){
             FIRDatabase.database().reference().child("routes").child(currentRoute).child("public").observeSingleEvent(of: .value, with: { (routeDetailsSnap) in
                 self.title = (routeDetailsSnap.childSnapshot(forPath: "name").value as? String)!
@@ -100,12 +105,20 @@ class ChaperoneTableViewController: UITableViewController {
                 dateFormatter.locale = Locale(identifier: "en_US_POSIX")
                 self.routeDate = dateFormatter.date(from:isoDate)!
             })
+        } else {
+            print("no routes")
+            self.title = "No Route"
+            self.navigationItem.leftBarButtonItems?[1].isEnabled = false //TODO: Remove this when you get rid of reset
+            self.navigationItem.rightBarButtonItem?.isEnabled = false
         }
     }
     
     func loadStudents(){
         print("Loading the students")
-        let currentRoute = appUser?.routes?[0] ?? ""
+        var currentRoute = ""
+        if (appUser?.routes) != nil && (appUser?.routes?.count)! > 0{
+            currentRoute = appUser?.routes?[0] ?? ""
+        }
         if !(currentRoute.isEmpty){
             //TODO: find the actual time for the bus
             FIRDatabase.database().reference().child("routes").child(currentRoute).child("private")
@@ -189,6 +202,10 @@ class ChaperoneTableViewController: UITableViewController {
     
     func getDayOfWeek(dayAsInt: Int, hour: Int) -> String{
         var dayAndTime: String = ""
+        var dayAsInt = dayAsInt
+        if(hour>19){
+            dayAsInt = dayAsInt + 1
+        }
         if(dayAsInt == 1){
             return "mon_am"
         }
@@ -207,7 +224,7 @@ class ChaperoneTableViewController: UITableViewController {
         else if(dayAsInt == 6){
             dayAndTime = "fri"
         }
-        else if(dayAsInt == 7){
+        else if(dayAsInt == 7 || dayAsInt == 8){
             dayAndTime = "mon_am"
         }
         if(hour < 11 || hour > 19){

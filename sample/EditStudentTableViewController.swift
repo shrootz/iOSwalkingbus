@@ -255,7 +255,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         let lastSchool = schoolTextView.text
         schoolTextView.text = schoolNamesForUI[row]
-        if(lastSchool != schoolTextView.text) {
+        if(lastSchool != "" && lastSchool != schoolTextView.text) {
             for(time, _) in (student?.schedule)! {
                 student?.schedule[time]?[1] = ""
             }
