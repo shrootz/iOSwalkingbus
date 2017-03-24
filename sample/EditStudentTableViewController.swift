@@ -79,6 +79,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     //MARK: - Load
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("in view did load")
         //Initialise CoreBluetooth Central Manager
         centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
         //expectedTags.append("CB4C2E61-FEF3-47FF-8AEC-67A9B883016C")
@@ -96,7 +97,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             for time in (schedule.keys) {
                 let routeId = student?.schedule[time]?[0]
                 if (routeId != "") {
-                    let databaseReference = FIRDatabase.database().reference().child("routes").child(routeId!).child("name")
+                    let databaseReference = FIRDatabase.database().reference().child("routes").child(routeId!).child("public").child("name")
                     databaseReference.observeSingleEvent(of: .value, with: {(routeName) in
                         if (routeName.exists()) {
                             self.student?.schedule[time]?[1] = routeName.value as! String
@@ -163,7 +164,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                 }
             }
             
-            if let routeInfo = student.schedule["tues_am"]{
+            if let routeInfo = student.schedule["tue_am"]{
                 if (routeInfo[1] == "") {
                     tuesday_am.setTitle("...", for: .normal)
                 } else {
@@ -171,7 +172,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                 }
             }
             
-            if let routeInfo = student.schedule["tues_pm"]{
+            if let routeInfo = student.schedule["tue_pm"]{
                 if (routeInfo[1] == "") {
                     tuesday_pm.setTitle("...", for: .normal)
                 } else {
@@ -195,7 +196,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                 }
             }
             
-            if let routeInfo = student.schedule["thurs_am"]{
+            if let routeInfo = student.schedule["thu_am"]{
                 if (routeInfo[1] == "") {
                     thursday_am.setTitle("...", for: .normal)
                 } else {
@@ -203,7 +204,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
                 }
             }
             
-            if let routeInfo = student.schedule["thurs_pm"]{
+            if let routeInfo = student.schedule["thu_pm"]{
                 if (routeInfo[1] == "") {
                     thursday_pm.setTitle("...", for: .normal)
                 } else {
@@ -252,7 +253,14 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     
     // Catpure the picker view selection
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        let lastSchool = schoolTextView.text
         schoolTextView.text = schoolNamesForUI[row]
+        if(lastSchool != schoolTextView.text) {
+            for(time, _) in (student?.schedule)! {
+                student?.schedule[time]?[1] = ""
+            }
+            reloadRoutes()
+        }
     }
     
     // MARK: - Functions
@@ -290,7 +298,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     }
     
     func saveStudentToDatabase(){
-        let parentArray: [String: String] =  [(self.appUser?.userAuthId)! : (self.appUser?.userAuthId)!]
+        let parentArray: [String: [String:String]] =  [(self.appUser?.userAuthId)! : ["displayName":(self.appUser?.name)!, "phone":(self.appUser?.phoneNumber)!]]
         let studentInFirebase = FIRDatabase.database().reference().child("students").child((student?.studentDatabaseId)!)
         
         studentInFirebase.setValue([
@@ -330,7 +338,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         //delete from old routes
         for (time, routeInfo) in oldRoutes {
             if routeInfo[0] != ""{
-                FIRDatabase.database().reference().child("routes").child(routeInfo[0]).child("students").child(time).child((student?.studentDatabaseId)!).removeValue()
+                FIRDatabase.database().reference().child("routes").child(routeInfo[0]).child("private").child("students").child(time).child((student?.studentDatabaseId)!).removeValue()
                 
                 FIRDatabase.database().reference().child("students").child((student?.studentDatabaseId)!).child("routes").child(time).removeValue()
             }
@@ -340,7 +348,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         for (time, routeInfo) in (student?.schedule)! {
             if routeInfo[0] != ""{
                 
-                FIRDatabase.database().reference().child("routes").child(routeInfo[0]).child("students").child(time).child((student?.studentDatabaseId)!).setValue("1")
+                FIRDatabase.database().reference().child("routes").child(routeInfo[0]).child("private").child("students").child(time).child((student?.studentDatabaseId)!).setValue(student?.name)
                 FIRDatabase.database().reference().child("students").child((student?.studentDatabaseId)!).child("routes").child(time).setValue(routeInfo[0])
                 
             }
@@ -354,7 +362,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         let school = schoolTextView.text ?? ""
         let notes = student_notes.text ?? ""
         let photo = student_image.image
-        let status = "waiting"
+        let status = "no route"
         let bluetooth = MACAddress
         print("bluetooth found " + MACAddress)
         if (name == "" || school == "") {
@@ -381,12 +389,12 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         var schedule: [String: [String]] = [:]
         schedule["mon_am"] = [String](repeating: "", count:2)
         schedule["mon_pm"] = [String](repeating: "", count:2)
-        schedule["tues_am"] = [String](repeating: "", count:2)
-        schedule["tues_pm"] = [String](repeating: "", count:2)
+        schedule["tue_am"] = [String](repeating: "", count:2)
+        schedule["tue_pm"] = [String](repeating: "", count:2)
         schedule["wed_am"] = [String](repeating: "", count:2)
         schedule["wed_pm"] = [String](repeating: "", count:2)
-        schedule["thurs_am"] = [String](repeating: "", count:2)
-        schedule["thurs_pm"] = [String](repeating: "", count:2)
+        schedule["thu_am"] = [String](repeating: "", count:2)
+        schedule["thu_pm"] = [String](repeating: "", count:2)
         schedule["fri_am"] = [String](repeating: "", count:2)
         schedule["fri_pm"] = [String](repeating: "", count:2)
         return schedule
@@ -448,12 +456,12 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         else if sender as AnyObject? === tuesday_am {
             let mapViewController = segue.destination as! MapViewController
             mapViewController.student = self.student
-            mapViewController.time = "tues_am"
+            mapViewController.time = "tue_am"
         }
         else if sender as AnyObject? === tuesday_pm {
             let mapViewController = segue.destination as! MapViewController
             mapViewController.student = self.student
-            mapViewController.time = "tues_pm"
+            mapViewController.time = "tue_pm"
         }
         else if sender as AnyObject? === wednesday_am {
             let mapViewController = segue.destination as! MapViewController
@@ -468,12 +476,12 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         else if sender as AnyObject? === thursday_am {
             let mapViewController = segue.destination as! MapViewController
             mapViewController.student = self.student
-            mapViewController.time = "thurs_am"
+            mapViewController.time = "thu_am"
         }
         else if sender as AnyObject? === thursday_pm {
             let mapViewController = segue.destination as! MapViewController
             mapViewController.student = self.student
-            mapViewController.time = "thurs_pm"
+            mapViewController.time = "thu_pm"
         }
         else if sender as AnyObject? === friday_am {
             let mapViewController = segue.destination as! MapViewController

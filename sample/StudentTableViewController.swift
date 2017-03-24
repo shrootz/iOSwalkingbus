@@ -65,12 +65,12 @@ class StudentTableViewController: UITableViewController {
         var schedule: [String: [String]] = [:]
         schedule["mon_am"] = [String](repeating: "", count:2)
         schedule["mon_pm"] = [String](repeating: "", count:2)
-        schedule["tues_am"] = [String](repeating: "", count:2)
-        schedule["tues_pm"] = [String](repeating: "", count:2)
+        schedule["tue_am"] = [String](repeating: "", count:2)
+        schedule["tue_pm"] = [String](repeating: "", count:2)
         schedule["wed_am"] = [String](repeating: "", count:2)
         schedule["wed_pm"] = [String](repeating: "", count:2)
-        schedule["thurs_am"] = [String](repeating: "", count:2)
-        schedule["thurs_pm"] = [String](repeating: "", count:2)
+        schedule["thu_am"] = [String](repeating: "", count:2)
+        schedule["thu_pm"] = [String](repeating: "", count:2)
         schedule["fri_am"] = [String](repeating: "", count:2)
         schedule["fri_pm"] = [String](repeating: "", count:2)
         return schedule

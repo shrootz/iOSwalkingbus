@@ -79,10 +79,46 @@ class EditUserViewController: UIViewController, UITextFieldDelegate, UIImagePick
                     last_y = mySwitch.frame.maxY
                     self.view.addSubview(mySwitch)
                     self.view.addSubview(myLabel)
+                    mySwitch.addTarget(self, action: #selector(EditUserViewController.schoolSelected(_:)), for: UIControlEvents.valueChanged)
                 }
             }
         })
         
+    }
+    
+    func schoolSelected(_ mySwitch: UISwitch) {
+        //if a school is selected require a parent to enter the passcode
+        if mySwitch.isOn {
+            //1. Create the alert controller.
+            let alert = UIAlertController(title: "Verify", message: "Enter school passcode", preferredStyle: .alert)
+            
+            //2. Add the text field. You can configure it however you need.
+            alert.addTextField { (textField) in
+                textField.text = ""
+            }
+            
+            // 3. Grab the value from the text field, and print it when the user clicks OK.
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] (_) in
+                let textField = alert?.textFields![0] // Force unwrapping because we know it exists.
+                print("Text field: \(textField?.text)")
+                let thisSchool = self.schoolDict[mySwitch]! as UILabel;
+                let schoolName = thisSchool.text!
+            FIRDatabase.database().reference().child("schools").child(self.possibleSchools[schoolName]!).child("users").child(self.appUser.userAuthId).setValue(["displayName":self.appUser.name,
+                                                        "photoUrl":self.appUser.photoUrl,
+                                                        "phone":self.appUser.phoneNumber,
+                                                        "code":textField?.text]) { (error,ref) -> Void  in
+                    if(error != nil){
+                        mySwitch.isOn = false;
+                        self.displayToastMessage(displayText: "Please contact school for passcode")
+                    }
+                }
+    
+                
+            }))
+            
+            // 4. Present the alert.
+            self.present(alert, animated: true, completion: nil)
+        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -91,6 +127,23 @@ class EditUserViewController: UIViewController, UITextFieldDelegate, UIImagePick
     }
     
     //MARK: - Functions
+    func displayToastMessage(displayText: String) {
+        let toastLabel = UILabel(frame: CGRect(x: self.view.center.x-150, y : self.view.center.y, width: 300, height: 35))
+        toastLabel.backgroundColor = UIColor.black
+        toastLabel.textColor = UIColor.white
+        toastLabel.textAlignment = NSTextAlignment.center;
+        self.view.addSubview(toastLabel)
+        toastLabel.text = displayText
+        toastLabel.alpha = 1.0
+        toastLabel.layer.cornerRadius = 10;
+        toastLabel.clipsToBounds  =  true
+        UIView.animate(withDuration: 4.0, delay: 0.1, options: .curveEaseOut, animations: {
+            
+            toastLabel.alpha = 0.0
+            
+        }, completion: nil)
+    }
+    
     func getDataFromUrl(url: URL, completion: @escaping (_ data: Data?, _  response: URLResponse?, _ error: Error?) -> Void) {
         URLSession.shared.dataTask(with: url) {
             (data, response, error) in
@@ -116,7 +169,7 @@ class EditUserViewController: UIViewController, UITextFieldDelegate, UIImagePick
                 let databaseReference = FIRDatabase.database().reference().child("schools").child(possibleSchools[schoolName]!).child("users").child(appUser.userAuthId)
                 if(toggle.isOn) {
                     schoolUpdates[possibleSchools[schoolName]!] = schoolName
-                    databaseReference.setValue(appUser.name)
+                    FIRDatabase.database().reference().child("schools").child(self.possibleSchools[schoolName]!).child("users").child(self.appUser.userAuthId).updateChildValues(["displayName":self.nameField.text as Any, "photoUrl":self.appUser.photoUrl as Any,"phone":self.phoneField.text as Any])
                 } else {
                     databaseReference.removeValue()
                 }

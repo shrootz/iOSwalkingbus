@@ -12,7 +12,7 @@ import UIKit
 class User {
     // MARK: Properties
     var userAuthId: String
-    var routes: String
+    var routes: [String]?
     var name: String?
     var phoneNumber: String?
     var email: String?
@@ -20,7 +20,7 @@ class User {
     var students: [String]?
     var schoolsParent: [String:String]?
     
-    init?(userAuthId: String, name: String, phoneNumber: String, email: String, photoUrl: String, students: [String], schoolsParent: [String:String], routes:String){
+    init?(userAuthId: String, name: String, phoneNumber: String, email: String, photoUrl: String, students: [String], schoolsParent: [String:String], routes:[String]){
         self.userAuthId = userAuthId
         self.name = name
         self.phoneNumber = phoneNumber

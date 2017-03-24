@@ -58,6 +58,7 @@ class ChaperoneTableViewController: UITableViewController {
     //MARK: - Load
     override func viewDidLoad() {
         super.viewDidLoad()
+        loadRouteInfo()
         loadStudents()
         //Initialise CoreBluetooth Central Manager
         centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
@@ -65,18 +66,27 @@ class ChaperoneTableViewController: UITableViewController {
         expectedTags.append("WalkingBus")
     }
     
+    func loadRouteInfo(){
+        print("Loading the route info")
+        //ChaperoneTableViewController.title = ""
+    }
+    
     func loadStudents(){
         print("Loading the students")
-        if !(appUser?.routes.isEmpty)!{
+        let currentRoute = appUser?.routes?[0] ?? ""
+        if !(currentRoute.isEmpty){
             //TODO: find the actual time for the bus
-            FIRDatabase.database().reference().child("routes").child((appUser?.routes)!).child("students").child("mon_am").observeSingleEvent(of: .value, with: { (routeStudentDetailsSnap) in
+            FIRDatabase.database().reference().child("routes").child(currentRoute).child("private").child("students").child("mon_am").observeSingleEvent(of: .value, with: { (routeStudentDetailsSnap) in
                 for student in routeStudentDetailsSnap.children.allObjects{
                     let studentKey = (student as AnyObject).key as String
                     if !studentKey.isEmpty {
                         self.loadSingleStudent(studentKey: studentKey)
                     }
                 }
-            })
+            }) { (error) in
+                //code here not called either
+                print("did not get any students")
+            }
             
         }
     }
@@ -102,6 +112,7 @@ class ChaperoneTableViewController: UITableViewController {
             }
             
             //create local student object
+            //TODO: don't forget to delete the child under the specific routes?
             let myStudent = Student(name: student_name!, photo: UIImage(named:"DefaultImage"), schoolName:school_name, info:student_notes, schedule:[:], studentDatabaseId:studentKey, schoolDatabaseId:student_school, bluetooth: student_bluetooth, status:student_status)!
             self.students += [myStudent]
             if studentDetailsSnap.hasChild("photoUrl"){

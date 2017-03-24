@@ -79,7 +79,7 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
         var email = ""
         var phoneNumber = ""
         var photoUrl = ""
-        var routes: String = ""
+        var routes: [String] = []
         var students: [String] = []
         var schoolsParent: [String:String] = [:]
         
@@ -91,7 +91,9 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
                 email = (userSnap.childSnapshot(forPath: "email").value as? String)!
                 photoUrl = (userSnap.childSnapshot(forPath: "photoUrl").value as? String)!
                 phoneNumber = (userSnap.childSnapshot(forPath: "phone").value as? String)!
-                routes = (userSnap.childSnapshot(forPath: "routes").value as? String) ?? ""
+                if let routesDict = userSnap.childSnapshot(forPath: "routes").value as? [String:String] {
+                    routes = Array(routesDict.keys)
+                }
                 if let studentsDict = userSnap.childSnapshot(forPath: "students").value as? [String:String] {
                     students = Array(studentsDict.keys)
                 }

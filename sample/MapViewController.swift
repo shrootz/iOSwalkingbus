@@ -81,7 +81,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
         databaseReference.observeSingleEvent(of: .value, with: { (routesSnap) in
             if (routesSnap.exists()) {
                 for route in routesSnap.children.allObjects {
-                    let routeDatabaseReference = FIRDatabase.database().reference().child("routes").child((route as AnyObject).key).child("location")
+                    let routeDatabaseReference = FIRDatabase.database().reference().child("routes").child((route as AnyObject).key).child("public").child("location")
                     routeDatabaseReference.observeSingleEvent(of: .value, with: {(routeSnap) in
                         if routeSnap.exists(){
                             let routeLat = routeSnap.childSnapshot(forPath: "lat").value as! Double
@@ -104,7 +104,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
         
     }
     func loadRouteName(routeKey:String){
-        let nameDatabaseReference = FIRDatabase.database().reference().child("routes").child(routeKey).child("name")
+        let nameDatabaseReference = FIRDatabase.database().reference().child("routes").child(routeKey).child("public").child("name")
         nameDatabaseReference.observeSingleEvent(of: .value, with: { (routeNameSnap) in
             if (routeNameSnap.exists()) {
                 let routeName = routeNameSnap.value as! String
@@ -116,15 +116,20 @@ class MapViewController: UIViewController, GMSMapViewDelegate, UINavigationContr
     }
     
     func loadRouteTime(routeKey:String) {
-        let nameDatabaseReference = FIRDatabase.database().reference().child("routes").child(routeKey).child("time")
+        let nameDatabaseReference = FIRDatabase.database().reference().child("routes").child(routeKey).child("public").child("time")
         nameDatabaseReference.observeSingleEvent(of: .value, with: { (routeTimeSnap) in
             if (routeTimeSnap.exists()) {
-                let routeTime = routeTimeSnap.value as! String
+                let routeTime = routeTimeSnap.value as? String ?? "\n"
                 let originalSnippet = self.markerRouteKeyMapping[routeKey]?.snippet
                 if (self.time?.contains("am"))! {
                     self.markerRouteKeyMapping[routeKey]?.snippet = "Departs at " + routeTime + "\n" + originalSnippet!
+                } else {
+                     self.markerRouteKeyMapping[routeKey]?.snippet = "\n" + originalSnippet!
                 }
                 
+            } else { //need this in case there is no time. probably can be done cleaner
+                let originalSnippet = self.markerRouteKeyMapping[routeKey]?.snippet
+                self.markerRouteKeyMapping[routeKey]?.snippet = "\n" + originalSnippet!
             }
         })
     }
