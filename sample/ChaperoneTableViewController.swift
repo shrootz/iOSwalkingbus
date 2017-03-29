@@ -10,6 +10,7 @@ import Firebase
 import UIKit
 import CoreBluetooth
 
+
 class ChaperoneTableViewController: UITableViewController {
     //MARK: - Variables
     var appUser: User?
@@ -17,8 +18,9 @@ class ChaperoneTableViewController: UITableViewController {
     var centralManager: CBCentralManager?
     var peripherals = Array<CBPeripheral>()
     var expectedTags = Array<String>()
-    var studentsWithChaperone = [String]()
-    var routeDate: Date = Date()
+    var currentStudentsWithChaperone = [String]()
+    //var routeDate: Date = Date()
+    var routeStatus: String = ""
     
     @IBOutlet weak var groupActionButton: UIBarButtonItem!
     
@@ -27,15 +29,22 @@ class ChaperoneTableViewController: UITableViewController {
             student.status = "waiting"
             let databaseReference = FIRDatabase.database().reference().child("students").child(student.studentDatabaseId).child("status")
             databaseReference.setValue(student.status)
+            self.routeStatus = "waiting"
+            FIRDatabase.database().reference().child("routes").child((self.appUser?.routes?[0])!).child("private").child("status").setValue(self.routeStatus)
+            groupActionButton.isEnabled = true
+            groupActionButton.title = "Leaving"
+            //appUser?.bluetoothMapScans.removeAll()
+            //appUser?.bluetoothMapStudent.removeAll()
+            //appUser?.studentsWithChaperone.removeAll()
         }
         tableView.reloadData()
-        //startScanning()
     }
     
     @IBAction func groupActionButton(_ sender: UIBarButtonItem) {
         if sender.title == "Leaving" {
-            print(studentsWithChaperone)
-            let alertTitle = "You are picking up " + String(studentsWithChaperone.count) + " students. " + String(students.count) + " students are registered for this bus."
+            print(appUser?.studentsWithChaperone)
+            self.findBluetoothWithStudents()
+            let alertTitle = "You are picking up " + String((appUser?.studentsWithChaperone.count)!) + " students. " + String(students.count) + " students are registered for this bus."
             //1. Create the alert controller.
             let alert = UIAlertController(title: alertTitle, message: "Are you sure you want to leave?", preferredStyle: .alert)
             
@@ -56,7 +65,8 @@ class ChaperoneTableViewController: UITableViewController {
                 }
                 self.tableView.reloadData()
                 sender.title = "Dropping Off"
-                
+                self.routeStatus = "picked up"
+                FIRDatabase.database().reference().child("routes").child((self.appUser?.routes?[0])!).child("private").child("status").setValue(self.routeStatus)
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { [weak alert] (_) in }))
@@ -65,6 +75,8 @@ class ChaperoneTableViewController: UITableViewController {
             self.present(alert, animated: true, completion: nil)
             
         } else if sender.title == "Dropping Off" {
+            self.routeStatus = "dropped up"
+            FIRDatabase.database().reference().child("routes").child((self.appUser?.routes?[0])!).child("private").child("status").setValue(self.routeStatus)
             for student in students {
                 if (student.status == "picked up") {
                     student.status = "dropped off"
@@ -73,7 +85,7 @@ class ChaperoneTableViewController: UITableViewController {
                 databaseReference.setValue(student.status)
             }
             tableView.reloadData()
-            sender.title = "Leaving"
+            sender.isEnabled = false
         }
     }
     //MARK: - Load
@@ -96,13 +108,25 @@ class ChaperoneTableViewController: UITableViewController {
         if !(currentRoute.isEmpty){
             FIRDatabase.database().reference().child("routes").child(currentRoute).child("public").observeSingleEvent(of: .value, with: { (routeDetailsSnap) in
                 self.title = (routeDetailsSnap.childSnapshot(forPath: "name").value as? String)!
-                let isoDate = (routeDetailsSnap.childSnapshot(forPath: "time").value as? String)!
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "HH:mm"
-                dateFormatter.timeZone = TimeZone.current
-                dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-                self.routeDate = dateFormatter.date(from:isoDate)!
             })
+            FIRDatabase.database().reference().child("routes").child(currentRoute).child("private").child("status").observeSingleEvent(of: .value, with: { (routeStatusDetailsSnap) in
+                if(routeStatusDetailsSnap.exists()){
+                    self.routeStatus = (routeStatusDetailsSnap.value as? String)!
+                    if(self.routeStatus == "picked up"){
+                        self.groupActionButton.title = "Dropping Off"
+                    }
+                    else if(self.routeStatus == "dropped up"){
+                        self.groupActionButton.isEnabled = false
+                    }
+                    else if(self.routeStatus == "waiting"){
+                        self.groupActionButton.title = "Leaving"
+                        self.appUser?.bluetoothMapScans.removeAll()
+                        self.appUser?.bluetoothMapStudent.removeAll()
+                        self.appUser?.studentsWithChaperone.removeAll()
+                    }
+                }
+            })
+            
         } else {
             print("no routes")
             self.title = "No Route"
@@ -229,8 +253,9 @@ class ChaperoneTableViewController: UITableViewController {
                 cell.statusButton.setTitleColor(.gray, for: .normal)
                 break
             case "dropped off":
-                cell.statusButton.setTitle("Pick Up", for: .normal)
-                cell.statusButton.setTitleColor(.green, for: .normal)
+                //cell.statusButton.setTitle("Pick Up", for: .normal)
+                //cell.statusButton.setTitleColor(.green, for: .normal)
+                cell.statusButton.isEnabled = false
                 break
             default:
                 break
@@ -270,18 +295,34 @@ class ChaperoneTableViewController: UITableViewController {
     }
     
     func updateStatusFromBlueTooth(){
-        for currentStudent in students{
-            let student_bluetooth = currentStudent.bluetooth
-            for bluetooth_found in studentsWithChaperone{
-                if student_bluetooth == bluetooth_found {
-                    currentStudent.status = "picked up"
-                    let databaseReference = FIRDatabase.database().reference().child("students").child(currentStudent.studentDatabaseId).child("status")
-                    databaseReference.setValue(currentStudent.status)
-                }
+        for bluetooth_found in (appUser?.studentsWithChaperone)!{
+            if let myStudent = appUser?.bluetoothMapStudent[bluetooth_found]{
+                myStudent.status = "picked up"
+                let databaseReference = FIRDatabase.database().reference().child("students").child((myStudent.studentDatabaseId)).child("status")
+                    databaseReference.setValue(myStudent.status)
             }
         }
         tableView.reloadData()
     }
+    
+    func findBluetoothWithStudents(){
+        for (index,bluetooth_found) in (appUser?.studentsWithChaperone.enumerated())!{
+            var bluetooth_is_found = false
+            for currentStudent in students{
+                let student_bluetooth = currentStudent.bluetooth
+                if student_bluetooth == bluetooth_found {
+                    appUser?.bluetoothMapStudent[bluetooth_found] = currentStudent
+                    appUser?.bluetoothMapScans[bluetooth_found] = 0
+                    bluetooth_is_found = true
+                }
+            }
+            if(!bluetooth_is_found){
+                appUser?.studentsWithChaperone.remove(at: index)
+            }
+        }
+    }
+    
+    
     
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -340,7 +381,36 @@ extension ChaperoneTableViewController: CBCentralManagerDelegate {
     
     func stopScanning(){
         peripherals.removeAll()
-        if groupActionButton.title != "Dropping Off"{
+        if(self.routeStatus == "picked up"){
+            var set1:Set<String> = Set(appUser!.studentsWithChaperone)
+            let set2:Set<String> = Set(currentStudentsWithChaperone)
+            let set3 = set2.intersection(set1)
+            set1.subtract(set2)
+            for mac in set1 {
+                if let value = appUser?.bluetoothMapScans[mac] {
+                    appUser?.bluetoothMapScans[mac] = value + 1
+                    if(appUser?.bluetoothMapScans[mac] == 3){
+                        appUser?.bluetoothMapStudent[mac]?.status = "lost"
+                        let databaseReference = FIRDatabase.database().reference().child("students").child((appUser?.bluetoothMapStudent[mac]?.studentDatabaseId)!).child("status")
+                        databaseReference.setValue(appUser?.bluetoothMapStudent[mac]?.status)
+                        tableView.reloadData()
+                    }
+                }
+            }
+            for mac in set3 {
+                if let value = appUser?.bluetoothMapScans[mac] {
+                    if(value >= 3){
+                        appUser?.bluetoothMapStudent[mac]?.status = "picked up"
+                        let databaseReference = FIRDatabase.database().reference().child("students").child((appUser?.bluetoothMapStudent[mac]?.studentDatabaseId)!).child("status")
+                        databaseReference.setValue(appUser?.bluetoothMapStudent[mac]?.status)
+                        tableView.reloadData()
+                    }
+                    appUser?.bluetoothMapScans[mac] = 0
+                }
+            }
+            currentStudentsWithChaperone.removeAll()
+        }
+        if (routeStatus != "dropped_off"){
             startScanning()
         }
     }
@@ -374,8 +444,15 @@ extension ChaperoneTableViewController: CBCentralManagerDelegate {
                         MACAddress += String(format: "%02X", manufacturerData[i])
                     }
                     print("MAC Address: \(MACAddress)")
-                    if !studentsWithChaperone.contains(MACAddress){
-                        studentsWithChaperone.append(MACAddress)
+                    if(self.routeStatus == "waiting"){
+                        if !(appUser?.studentsWithChaperone.contains(MACAddress))!{
+                            appUser?.studentsWithChaperone.append(MACAddress)
+                        }
+                    }
+                    else if(self.routeStatus == "picked up"){
+                        if !currentStudentsWithChaperone.contains(MACAddress){
+                            currentStudentsWithChaperone.append(MACAddress)
+                        }
                     }
                     //1 byte battery level
                     let batteryLevel = Int(manufacturerData[8])

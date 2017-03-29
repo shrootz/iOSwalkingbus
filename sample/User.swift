@@ -20,6 +20,9 @@ class User {
     var students: [String]?
     var schoolsParent: [String:String]?
     var currentTime: String = "mon_am"
+    var studentsWithChaperone = [String]()
+    var bluetoothMapStudent = [String:Student]()
+    var bluetoothMapScans = [String:Int]()
     
     init?(userAuthId: String, name: String, phoneNumber: String, email: String, photoUrl: String, students: [String], schoolsParent: [String:String], routes:[String]){
         self.userAuthId = userAuthId

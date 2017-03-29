@@ -362,7 +362,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         let school = schoolTextView.text ?? ""
         let notes = student_notes.text ?? ""
         let photo = student_image.image
-        let status = "no route"
+        var status = "no route"
         let bluetooth = MACAddress
         print("bluetooth found " + MACAddress)
         if (name == "" || school == "") {
@@ -374,6 +374,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         if (self.student != nil) {
             studentSchedule = (self.student?.schedule)!
             studentDatabaseId = (self.student?.studentDatabaseId)!
+            status = (self.student?.status)!
         }
         let schoolDatabaseId = appUser?.schoolsParent?[school]
         if let updatedStudent = Student(name: name, photo: photo, schoolName: school, info: notes, schedule: studentSchedule, studentDatabaseId: studentDatabaseId, schoolDatabaseId: schoolDatabaseId!, bluetooth: bluetooth, status:status) {
