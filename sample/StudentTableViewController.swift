@@ -15,6 +15,7 @@ class StudentTableViewController: UITableViewController {
     var students = [Student]()
     var parentAuthId: String?
     var appUser: User?
+    let messageComposer = MessageComposer()
     
     //MARK: - Load
     func loadStudents() {
@@ -52,7 +53,7 @@ class StudentTableViewController: UITableViewController {
                     let photoLocation = "\(studentKey)/\("photoUrl")"
                     self.loadStudentPhoto(withLocation: photoLocation, forStudent:studentKey)
                 }
-                
+                self.watchStatus(myStudent: myStudent,index: self.students.index(of: myStudent)!)
                 DispatchQueue.main.async{
                     self.tableView.reloadData()
                 }
@@ -94,6 +95,14 @@ class StudentTableViewController: UITableViewController {
         })
     }
     
+    func watchStatus(myStudent: Student, index:Int){
+            FIRDatabase.database().reference().child("students/").child(myStudent.studentDatabaseId).child("status").observe(.value, with: { snapshot in
+                myStudent.status = (snapshot.value) as! String
+                let indexPath = IndexPath(item:index, section:0)
+                self.tableView.reloadRows(at: [indexPath], with: .none)
+            })
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         loadStudents()
@@ -104,7 +113,7 @@ class StudentTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    // MARK: - Functions 
+    // MARK: - Functions
     
     //FIXME: maybe? I think I work now
     func deleteStudentFromDatabase(student: Student) {
@@ -122,21 +131,58 @@ class StudentTableViewController: UITableViewController {
         databaseReference.child("students").child(student.studentDatabaseId).removeValue()
         
         
-        //delete from parents 
+        //delete from parents
         databaseReference.child("users").child((appUser?.userAuthId)!).child("students").child(student.studentDatabaseId).removeValue()
     }
     
     func messageButtonClicked(_ myButton: UIButton) {
-
+        print("call button was clicked")
+        let student = students[myButton.tag]
+        FIRDatabase.database().reference().child("/students/").child(student.studentDatabaseId).child("routes").child((self.appUser?.currentTime)!).observeSingleEvent(of: .value, with: { (studentRouteSnap) in
+            if(studentRouteSnap.exists()){
+                FIRDatabase.database().reference().child("routes").child(studentRouteSnap.value as! String).child("public").child("chaperones").observeSingleEvent(of: .value, with: { (chaperoneInfoSnap) in
+                    for chaperoneSpecifics in chaperoneInfoSnap.children.allObjects as! [FIRDataSnapshot]{
+                        if let chaperonePhone = chaperoneSpecifics.childSnapshot(forPath: "phone").value as? String{
+                            // Make sure the device can send text messages
+                            if (self.messageComposer.canSendText()) {
+                                // Obtain a configured MFMessageComposeViewController
+                                let messageComposeVC = self.messageComposer.configuredMessageComposeViewController()
+                                messageComposeVC.recipients = [chaperonePhone]
+                                // Present the configured MFMessageComposeViewController instance
+                                // Note that the dismissal of the VC will be handled by the messageComposer instance,
+                                // since it implements the appropriate delegate call-back
+                                self.present(messageComposeVC, animated: true, completion: nil)
+                            } else {
+                                // Let the user know if his/her device isn't able to send text messages
+                                let errorAlert = UIAlertView(title: "Cannot Send Text Message", message: "Your device is not able to send text messages.", delegate: self, cancelButtonTitle: "OK")
+                                errorAlert.show()
+                            }
+                        }
+                    }
+                })
+            }
+        })
     }
     
     func callButtonClicked(_ myButton: UIButton) {
         print("call button was clicked")
-        guard let number = URL(string: "telprompt://15129030264") else {
-            print("failure to use number")
-            return
-        }
-        UIApplication.shared.open(number, options: [:], completionHandler: nil)
+        let student = students[myButton.tag]
+        FIRDatabase.database().reference().child("/students/").child(student.studentDatabaseId).child("routes").child((self.appUser?.currentTime)!).observeSingleEvent(of: .value, with: { (studentRouteSnap) in
+            if(studentRouteSnap.exists()){
+                FIRDatabase.database().reference().child("routes").child(studentRouteSnap.value as! String).child("public").child("chaperones").observeSingleEvent(of: .value, with: { (chaperoneInfoSnap) in
+                    for chaperoneSpecifics in chaperoneInfoSnap.children.allObjects as! [FIRDataSnapshot]{
+                        if let chaperonePhone = chaperoneSpecifics.childSnapshot(forPath: "phone").value as? String{
+                            guard let number = URL(string: "telprompt://" + chaperonePhone) else {
+                                print("failure to use number")
+                                return
+                            }
+                            UIApplication.shared.open(number, options: [:], completionHandler: nil)
+                            break;
+                        }
+                    }
+                })
+            }
+        })
     }
     
     // MARK: - Table view data source
@@ -158,8 +204,12 @@ class StudentTableViewController: UITableViewController {
         cell.schoolLabel.text = student.schoolName
         cell.chaperoneLabel.text = student.status
         if(cell.chaperoneLabel.text != "lost"){
-            //cell.messageButton.isHidden = true
-            //cell.messageButton.isHidden = true
+            cell.callButton.isEnabled = false
+            cell.messageButton.isEnabled = false
+        }
+        else{
+            cell.callButton.isEnabled = true
+            cell.messageButton.isEnabled = true
         }
         cell.messageButton.tag = indexPath.row
         cell.messageButton.addTarget(self, action: #selector(self.messageButtonClicked(_:)), for: UIControlEvents.touchUpInside)
@@ -237,6 +287,6 @@ class StudentTableViewController: UITableViewController {
         //do nothing b/c you don't want to update any exsisting data
         print("Back button pressed from edit student page")
     }
-
+    
     
 }

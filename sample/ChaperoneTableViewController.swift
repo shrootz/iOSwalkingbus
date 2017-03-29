@@ -19,7 +19,6 @@ class ChaperoneTableViewController: UITableViewController {
     var expectedTags = Array<String>()
     var studentsWithChaperone = [String]()
     var routeDate: Date = Date()
-    var currentTime: String = ""
     
     @IBOutlet weak var groupActionButton: UIBarButtonItem!
     
@@ -80,7 +79,6 @@ class ChaperoneTableViewController: UITableViewController {
     //MARK: - Load
     override func viewDidLoad() {
         super.viewDidLoad()
-        getCurrentTime()
         loadRouteInfo()
         loadStudents()
         //Initialise CoreBluetooth Central Manager
@@ -119,10 +117,12 @@ class ChaperoneTableViewController: UITableViewController {
         if (appUser?.routes) != nil && (appUser?.routes?.count)! > 0{
             currentRoute = appUser?.routes?[0] ?? ""
         }
+        print("currentRoute is " + currentRoute)
+        print("currentTime is " + (self.appUser?.currentTime)!)
         if !(currentRoute.isEmpty){
             //TODO: find the actual time for the bus
             FIRDatabase.database().reference().child("routes").child(currentRoute).child("private")
-                .child("students").child(self.currentTime).observeSingleEvent(of: .value, with: { (routeStudentDetailsSnap) in
+                .child("students").child((self.appUser?.currentTime)!).observeSingleEvent(of: .value, with: { (routeStudentDetailsSnap) in
                 for student in routeStudentDetailsSnap.children.allObjects{
                     let studentKey = (student as AnyObject).key as String
                     if !studentKey.isEmpty {
@@ -133,7 +133,6 @@ class ChaperoneTableViewController: UITableViewController {
                 //code here not called either
                 print("did not get any students")
             }
-            
         }
     }
     
@@ -142,6 +141,7 @@ class ChaperoneTableViewController: UITableViewController {
     }
     
     func loadSingleStudent(studentKey: String){
+        print("Loading single student with key " + studentKey)
         FIRDatabase.database().reference().child("students").child(studentKey).observeSingleEvent(of: .value, with: { (studentDetailsSnap) in
             let student_name = studentDetailsSnap.childSnapshot(forPath: "name").value as? String
             let student_notes = studentDetailsSnap.childSnapshot(forPath: "info").value as? String ?? ""
@@ -190,13 +190,6 @@ class ChaperoneTableViewController: UITableViewController {
     }
     
     //MARK: - Functions
-    func getCurrentTime(){
-        FIRDatabase.database().reference().child("current_timeslot").observeSingleEvent(of: .value, with: { (studentDetailsSnap) in
-             self.currentTime = studentDetailsSnap.childSnapshot(forPath: "info").value as? String ?? ""
-        }){ (error) in
-            self.currentTime = "mon_am"
-        }
-    }
     
     // MARK: - Table view data source
     override func numberOfSections(in tableView: UITableView) -> Int {

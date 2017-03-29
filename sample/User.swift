@@ -19,6 +19,7 @@ class User {
     var photoUrl: String?
     var students: [String]?
     var schoolsParent: [String:String]?
+    var currentTime: String = "mon_am"
     
     init?(userAuthId: String, name: String, phoneNumber: String, email: String, photoUrl: String, students: [String], schoolsParent: [String:String], routes:[String]){
         self.userAuthId = userAuthId

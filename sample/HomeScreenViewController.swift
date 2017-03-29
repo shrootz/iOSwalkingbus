@@ -120,11 +120,21 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
                     "phone": phoneNumber
                     ])
             }
-            
             self.appUser = User(userAuthId: userAuthId, name: userName, phoneNumber: phoneNumber, email: email, photoUrl: photoUrl, students: students, schoolsParent: schoolsParent, routes: routes)
-    
+            self.getCurrentTime()
         })
         
+    }
+    
+    func getCurrentTime(){
+        FIRDatabase.database().reference().child("current_timeslot").observe(.value, with: { snapshot in
+            self.appUser.currentTime = (snapshot.value) as! String
+        })
+        /*
+        let refHandle = FIRDatabase.database().reference().child("current_timeslot").observe(of: .value, with: {(timeSnap) in
+            self.appUser.currentTime = timeSnap.value
+        })
+         */
     }
     
     // MARK: - Navigation
