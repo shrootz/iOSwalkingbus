@@ -126,6 +126,19 @@ class StudentTableViewController: UITableViewController {
         databaseReference.child("users").child((appUser?.userAuthId)!).child("students").child(student.studentDatabaseId).removeValue()
     }
     
+    func messageButtonClicked(_ myButton: UIButton) {
+
+    }
+    
+    func callButtonClicked(_ myButton: UIButton) {
+        print("call button was clicked")
+        guard let number = URL(string: "telprompt://15129030264") else {
+            print("failure to use number")
+            return
+        }
+        UIApplication.shared.open(number, options: [:], completionHandler: nil)
+    }
+    
     // MARK: - Table view data source
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -144,6 +157,14 @@ class StudentTableViewController: UITableViewController {
         cell.photoImageView.image = student.photo
         cell.schoolLabel.text = student.schoolName
         cell.chaperoneLabel.text = student.status
+        if(cell.chaperoneLabel.text != "lost"){
+            //cell.messageButton.isHidden = true
+            //cell.messageButton.isHidden = true
+        }
+        cell.messageButton.tag = indexPath.row
+        cell.messageButton.addTarget(self, action: #selector(self.messageButtonClicked(_:)), for: UIControlEvents.touchUpInside)
+        cell.callButton.tag = indexPath.row
+        cell.callButton.addTarget(self, action: #selector(self.callButtonClicked(_:)), for: UIControlEvents.touchUpInside)
         return cell
     }
     

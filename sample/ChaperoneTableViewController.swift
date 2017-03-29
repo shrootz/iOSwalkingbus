@@ -188,55 +188,17 @@ class ChaperoneTableViewController: UITableViewController {
             }
         })
     }
+    
     //MARK: - Functions
-    func getCurrentTime() {
-        let todayDate = Date()
-        //let myCalendar = Calendar.current
-        let myCalendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
-        let myComponents = myCalendar.components(.weekday, from: todayDate)
-        let weekDay = myComponents.weekday
-        let hour = myCalendar.component(.hour, from: todayDate)
-        self.currentTime = getDayOfWeek(dayAsInt: weekDay!, hour: hour)
-        print("I think the current time is " + self.currentTime)
+    func getCurrentTime(){
+        FIRDatabase.database().reference().child("current_timeslot").observeSingleEvent(of: .value, with: { (studentDetailsSnap) in
+             self.currentTime = studentDetailsSnap.childSnapshot(forPath: "info").value as? String ?? ""
+        }){ (error) in
+            self.currentTime = "mon_am"
+        }
     }
     
-    func getDayOfWeek(dayAsInt: Int, hour: Int) -> String{
-        var dayAndTime: String = ""
-        var dayAsInt = dayAsInt
-        if(hour>19){
-            dayAsInt = dayAsInt + 1
-        }
-        if(dayAsInt == 1){
-            return "mon_am"
-        }
-        else if(dayAsInt == 2){
-            dayAndTime = "mon"
-        }
-        else if(dayAsInt == 3){
-            dayAndTime = "tue"
-        }
-        else if(dayAsInt == 4){
-            dayAndTime = "wed"
-        }
-        else if(dayAsInt == 5){
-            dayAndTime = "thu"
-        }
-        else if(dayAsInt == 6){
-            dayAndTime = "fri"
-        }
-        else if(dayAsInt == 7 || dayAsInt == 8){
-            dayAndTime = "mon_am"
-        }
-        if(hour < 11 || hour > 19){
-            dayAndTime += "_am"
-        }
-        else{
-            dayAndTime += "_pm"
-        }
-        return dayAndTime
-    }
     // MARK: - Table view data source
-    
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
