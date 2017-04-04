@@ -9,9 +9,9 @@
 import Firebase
 import UIKit
 import CoreBluetooth
+import CoreLocation
 
-
-class ChaperoneTableViewController: UITableViewController {
+class ChaperoneTableViewController: UITableViewController, CLLocationManagerDelegate {
     //MARK: - Variables
     var appUser: User?
     var students = [Student]()
@@ -21,6 +21,7 @@ class ChaperoneTableViewController: UITableViewController {
     var currentStudentsWithChaperone = [String]()
     //var routeDate: Date = Date()
     var routeStatus: String = ""
+    let locationManager = CLLocationManager()
     
     @IBOutlet weak var groupActionButton: UIBarButtonItem!
     
@@ -75,7 +76,9 @@ class ChaperoneTableViewController: UITableViewController {
             self.present(alert, animated: true, completion: nil)
             
         } else if sender.title == "Dropping Off" {
-            self.routeStatus = "dropped up"
+            autoDropOff()
+            /*
+            self.routeStatus = "dropped off"
             FIRDatabase.database().reference().child("routes").child((self.appUser?.routes?[0])!).child("private").child("status").setValue(self.routeStatus)
             for student in students {
                 if (student.status == "picked up") {
@@ -86,6 +89,7 @@ class ChaperoneTableViewController: UITableViewController {
             }
             tableView.reloadData()
             sender.isEnabled = false
+             */
         }
     }
     //MARK: - Load
@@ -93,10 +97,32 @@ class ChaperoneTableViewController: UITableViewController {
         super.viewDidLoad()
         loadRouteInfo()
         loadStudents()
+        
         //Initialise CoreBluetooth Central Manager
         centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
         //expectedTags.append("CB4C2E61-FEF3-47FF-8AEC-67A9B883016C")
         expectedTags.append("WalkingBus")
+        
+        //setup locationManager
+        locationManager.delegate = self;
+        locationManager.distanceFilter = kCLLocationAccuracyNearestTenMeters;
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+        
+        // 1. status is not determined
+        if CLLocationManager.authorizationStatus() == .notDetermined {
+            locationManager.requestAlwaysAuthorization()
+        }
+            // 2. authorization were denied
+        else if CLLocationManager.authorizationStatus() == .denied {
+            print("Location services were previously denied. Please enable location services for this app in Settings.")
+        }
+            // 3. we do have authorization
+        if CLLocationManager.authorizationStatus() == .authorizedAlways {
+            locationManager.startUpdatingLocation()
+        }
+        
+        // setup test data
+        setupData()
     }
     
     func loadRouteInfo(){
@@ -115,7 +141,7 @@ class ChaperoneTableViewController: UITableViewController {
                     if(self.routeStatus == "picked up"){
                         self.groupActionButton.title = "Dropping Off"
                     }
-                    else if(self.routeStatus == "dropped up"){
+                    else if(self.routeStatus == "dropped off"){
                         self.groupActionButton.isEnabled = false
                     }
                     else if(self.routeStatus == "waiting"){
@@ -144,7 +170,6 @@ class ChaperoneTableViewController: UITableViewController {
         print("currentRoute is " + currentRoute)
         print("currentTime is " + (self.appUser?.currentTime)!)
         if !(currentRoute.isEmpty){
-            //TODO: find the actual time for the bus
             FIRDatabase.database().reference().child("routes").child(currentRoute).child("private")
                 .child("students").child((self.appUser?.currentTime)!).observeSingleEvent(of: .value, with: { (routeStudentDetailsSnap) in
                 for student in routeStudentDetailsSnap.children.allObjects{
@@ -180,11 +205,24 @@ class ChaperoneTableViewController: UITableViewController {
                     }
                 }
             }
-            
             //create local student object
             //TODO: don't forget to delete the child under the specific routes?
             let myStudent = Student(name: student_name!, photo: UIImage(named:"DefaultImage"), schoolName:school_name, info:student_notes, schedule:[:], studentDatabaseId:studentKey, schoolDatabaseId:student_school, bluetooth: student_bluetooth, status:student_status)!
             self.students += [myStudent]
+            if(student_status == "picked up"){
+                if !(self.appUser?.studentsWithChaperone.contains(student_bluetooth))!{
+                    self.appUser?.studentsWithChaperone.append(student_bluetooth)
+                    self.appUser?.bluetoothMapStudent[student_bluetooth] = myStudent
+                    self.appUser?.bluetoothMapScans[student_bluetooth] = 0
+                }
+            }
+            else if(student_status == "lost"){
+                if !(self.appUser?.studentsWithChaperone.contains(student_bluetooth))!{
+                    self.appUser?.studentsWithChaperone.append(student_bluetooth)
+                    self.appUser?.bluetoothMapStudent[student_bluetooth] = myStudent
+                    self.appUser?.bluetoothMapScans[student_bluetooth] = 10
+                }
+            }
             if studentDetailsSnap.hasChild("photoUrl"){
                 let photoLocation = "\(studentKey)/\("photoUrl")"
                 self.loadStudentPhoto(withLocation: photoLocation, forStudent:studentKey)
@@ -214,6 +252,76 @@ class ChaperoneTableViewController: UITableViewController {
     }
     
     //MARK: - Functions
+    func setupData() {
+        // 1. check if system can monitor regions
+        if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
+            
+            // 2. region data
+            let title = "School"
+            //let coordinate = CLLocationCoordinate2DMake(30.286395, -97.744514)
+            let coordinate = CLLocationCoordinate2DMake(20.286395, -97.744514)
+            let regionRadius = 100.0
+            
+            // 3. setup region
+            let region = CLCircularRegion(center: CLLocationCoordinate2D(latitude: coordinate.latitude,
+                                                                         longitude: coordinate.longitude), radius: regionRadius, identifier: title)
+            
+            region.notifyOnEntry=true
+            region.notifyOnExit=true
+            
+            locationManager.startMonitoring(for: region)
+            locationManager.requestState(for: region)
+
+        }
+        else {
+            print("System can't track regions")
+        }
+    }
+    
+    //1. user enter region
+    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
+        print("enter \(region.identifier)")
+        autoDropOff()
+    }
+    
+    // 2. user exit region
+    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
+        print("exit \(region.identifier)")
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didDetermineState state: CLRegionState, for region: CLRegion){
+        if (state == CLRegionState.inside){
+            print("I AM INSIDE")
+            autoDropOff()
+        } else if (state == CLRegionState.outside){
+            print("I AM OUTSIDE")
+        } else if (state == CLRegionState.unknown){
+            print("UNKNOWN")
+            return;
+        }
+    }
+    
+    func autoDropOff(){
+        if(self.routeStatus == "picked up"){
+            self.routeStatus = "dropped off"
+            FIRDatabase.database().reference().child("routes").child((self.appUser?.routes?[0])!).child("private").child("status").setValue(self.routeStatus)
+            for student in students {
+                if (student.status == "picked up") {
+                    student.status = "dropped off"
+                }
+                let databaseReference = FIRDatabase.database().reference().child("students").child(student.studentDatabaseId).child("status")
+                databaseReference.setValue(student.status)
+            }
+            tableView.reloadData()
+            groupActionButton.isEnabled = false
+        }
+    }
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let locValue:CLLocationCoordinate2D = manager.location!.coordinate
+        print("locations = \(locValue.latitude) \(locValue.longitude)")
+        self.appUser?.lastLat = locValue.latitude
+        self.appUser?.lastLong = locValue.longitude
+    }
     
     // MARK: - Table view data source
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -391,8 +499,11 @@ extension ChaperoneTableViewController: CBCentralManagerDelegate {
                     appUser?.bluetoothMapScans[mac] = value + 1
                     if(appUser?.bluetoothMapScans[mac] == 3){
                         appUser?.bluetoothMapStudent[mac]?.status = "lost"
-                        let databaseReference = FIRDatabase.database().reference().child("students").child((appUser?.bluetoothMapStudent[mac]?.studentDatabaseId)!).child("status")
-                        databaseReference.setValue(appUser?.bluetoothMapStudent[mac]?.status)
+                        let databaseReference = FIRDatabase.database().reference().child("students").child((appUser?.bluetoothMapStudent[mac]?.studentDatabaseId)!)
+                        databaseReference.child("status").setValue(appUser?.bluetoothMapStudent[mac]?.status)
+                        databaseReference.child("location").child("lat").setValue(appUser?.lastLat)
+                        databaseReference.child("location").child("lng").setValue(appUser?.lastLong)
+                        
                         tableView.reloadData()
                     }
                 }
@@ -401,8 +512,9 @@ extension ChaperoneTableViewController: CBCentralManagerDelegate {
                 if let value = appUser?.bluetoothMapScans[mac] {
                     if(value >= 3){
                         appUser?.bluetoothMapStudent[mac]?.status = "picked up"
-                        let databaseReference = FIRDatabase.database().reference().child("students").child((appUser?.bluetoothMapStudent[mac]?.studentDatabaseId)!).child("status")
-                        databaseReference.setValue(appUser?.bluetoothMapStudent[mac]?.status)
+                        let databaseReference = FIRDatabase.database().reference().child("students").child((appUser?.bluetoothMapStudent[mac]?.studentDatabaseId)!)
+                        databaseReference.child("status").setValue(appUser?.bluetoothMapStudent[mac]?.status)
+                        databaseReference.child("location").removeValue()
                         tableView.reloadData()
                     }
                     appUser?.bluetoothMapScans[mac] = 0
@@ -410,7 +522,7 @@ extension ChaperoneTableViewController: CBCentralManagerDelegate {
             }
             currentStudentsWithChaperone.removeAll()
         }
-        if (routeStatus != "dropped_off"){
+        if (routeStatus != "dropped off"){
             startScanning()
         }
     }

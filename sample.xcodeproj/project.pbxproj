@@ -12,6 +12,7 @@
 		D000530B1E4E5358004AE9AC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D000530A1E4E5358004AE9AC /* GoogleService-Info.plist */; };
 		D01C723B1E481FE400E21BAB /* EditStudentTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C723A1E481FE400E21BAB /* EditStudentTableViewController.swift */; };
 		D01C723F1E48301500E21BAB /* debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01C723E1E48301500E21BAB /* debug.swift */; };
+		D05E41631E8BAFBB00FD4707 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D05E41621E8BAFBB00FD4707 /* CoreLocation.framework */; };
 		D07190E11DCC42A700CDF595 /* StudentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07190E01DCC42A700CDF595 /* StudentTableViewCell.swift */; };
 		D07190E31DCC46BD00CDF595 /* StudentTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07190E21DCC46BD00CDF595 /* StudentTableViewController.swift */; };
 		D07190E51DCC4B4D00CDF595 /* Student.swift in Sources */ = {isa = PBXBuildFile; fileRef = D07190E41DCC4B4D00CDF595 /* Student.swift */; };
@@ -59,6 +60,7 @@
 		D00053131E4E6339004AE9AC /* sample-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "sample-Bridging-Header.h"; sourceTree = "<group>"; };
 		D01C723A1E481FE400E21BAB /* EditStudentTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditStudentTableViewController.swift; sourceTree = "<group>"; };
 		D01C723E1E48301500E21BAB /* debug.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = debug.swift; sourceTree = "<group>"; };
+		D05E41621E8BAFBB00FD4707 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		D07190E01DCC42A700CDF595 /* StudentTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StudentTableViewCell.swift; sourceTree = "<group>"; };
 		D07190E21DCC46BD00CDF595 /* StudentTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StudentTableViewController.swift; sourceTree = "<group>"; };
 		D07190E41DCC4B4D00CDF595 /* Student.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Student.swift; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D27AAD422E57B6A1877FA3A7 /* libPods-sample.a in Frameworks */,
+				D05E41631E8BAFBB00FD4707 /* CoreLocation.framework in Frameworks */,
 				D0AE6CDA1E8B559A004D8123 /* MessageUI.framework in Frameworks */,
 				D0AE6CDC1E8B55B0004D8123 /* Messages.framework in Frameworks */,
 				D0AE6CDE1E8B55BA004D8123 /* Social.framework in Frameworks */,
@@ -117,6 +120,7 @@
 		825B399A26F6291B98878AAE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D05E41621E8BAFBB00FD4707 /* CoreLocation.framework */,
 				D0AE6CDD1E8B55BA004D8123 /* Social.framework */,
 				D0AE6CDB1E8B55B0004D8123 /* Messages.framework */,
 				D0AE6CD91E8B559A004D8123 /* MessageUI.framework */,
