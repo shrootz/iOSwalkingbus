@@ -130,11 +130,6 @@ class HomeScreenViewController: UIViewController, GIDSignInUIDelegate {
         FIRDatabase.database().reference().child("current_timeslot").observe(.value, with: { snapshot in
             self.appUser.currentTime = (snapshot.value) as! String
         })
-        /*
-        let refHandle = FIRDatabase.database().reference().child("current_timeslot").observe(of: .value, with: {(timeSnap) in
-            self.appUser.currentTime = timeSnap.value
-        })
-         */
     }
     
     // MARK: - Navigation

@@ -19,6 +19,7 @@ class Student {
     var schedule: [String: [String]]
     var studentDatabaseId: String
     var schoolDatabaseId: String
+    var scansSinceLastFound: Int
     
     // MARK: Initialization
     
@@ -36,6 +37,7 @@ class Student {
             return nil
         }
         self.status = status
+        self.scansSinceLastFound = 0
     }
     
 }

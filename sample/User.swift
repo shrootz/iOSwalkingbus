@@ -20,11 +20,7 @@ class User {
     var students: [String]?
     var schoolsParent: [String:String]?
     var currentTime: String = "mon_am"
-    
-    var studentsWithChaperone = [String]()
-    var bluetoothMapStudent = [String:Student]()
-    var bluetoothMapScans = [String:Int]()
-    
+            
     var lastLat:Double?
     var lastLong:Double?
     

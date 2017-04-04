@@ -97,9 +97,11 @@ class StudentTableViewController: UITableViewController {
     
     func watchStatus(myStudent: Student, index:Int){
             FIRDatabase.database().reference().child("students/").child(myStudent.studentDatabaseId).child("status").observe(.value, with: { snapshot in
-                myStudent.status = (snapshot.value) as! String
-                let indexPath = IndexPath(item:index, section:0)
-                self.tableView.reloadRows(at: [indexPath], with: .none)
+                if let updatedStatus = snapshot.value as? String {
+                    myStudent.status = updatedStatus
+                }
+                //let indexPath = IndexPath(item:index, section:0)
+                self.tableView.reloadData()
             })
     }
     

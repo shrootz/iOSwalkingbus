@@ -275,7 +275,7 @@
 				TargetAttributes = {
 					D08A0AB41DC18F2500EECEA1 = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = 7AY8H792Y8;
+						DevelopmentTeam = ESYRSP2B4H;
 						ProvisioningStyle = Automatic;
 					};
 					D08A0AC81DC18F2500EECEA1 = {
@@ -557,10 +557,10 @@
 			baseConfigurationReference = 8A89C18B356D0459020FC955 /* Pods-sample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 7AY8H792Y8;
+				DEVELOPMENT_TEAM = ESYRSP2B4H;
 				INFOPLIST_FILE = sample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = seniordesign.sample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.seniordesign.walkingbus2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "sample/sample-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
@@ -572,10 +572,10 @@
 			baseConfigurationReference = 2FD50E961D5EB43824A81CA5 /* Pods-sample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 7AY8H792Y8;
+				DEVELOPMENT_TEAM = ESYRSP2B4H;
 				INFOPLIST_FILE = sample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = seniordesign.sample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.seniordesign.walkingbus2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "sample/sample-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
