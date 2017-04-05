@@ -23,6 +23,8 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
     var routeStatus: String = ""
     let locationManager = CLLocationManager()
     
+    var isScanning = true
+    
     @IBOutlet weak var groupActionButton: UIBarButtonItem!
     
     @IBAction func resetStudentStatusButton(_ sender: Any) {
@@ -39,7 +41,7 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
         
         tableView.reloadData()
         
-        startScanning()
+        //startScanning()
     }
     
     @IBAction func groupActionButton(_ sender: UIBarButtonItem) {
@@ -73,7 +75,7 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
                 sender.title = "Dropping Off"
                 self.routeStatus = "picked up"
                 FIRDatabase.database().reference().child("routes").child((self.appUser?.routes?[0])!).child("private").child("status").setValue(self.routeStatus)
-                self.startScanning()
+                //self.startScanning()
             }))
             
             alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { [weak alert] (_) in }))
@@ -123,7 +125,8 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
     }
     
     func dropOffUpdates() {
-        stopScanning()
+        print("Called drop off updates")
+        //stopScanning()
         self.routeStatus = "dropped off"
         FIRDatabase.database().reference().child("routes").child((self.appUser?.routes?[0])!).child("private").child("status").setValue(self.routeStatus)
         for student in students {
@@ -140,10 +143,12 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
     //MARK: - Load
     override func viewDidLoad() {
         super.viewDidLoad()
+        UIApplication.shared.isIdleTimerDisabled = true
         //Initialise CoreBluetooth Central Manager
         centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
         //expectedTags.append("CB4C2E61-FEF3-47FF-8AEC-67A9B883016C")
         expectedTags.append("WalkingBus")
+        expectedTags.append("Walking Bus")
         
         //setup locationManager
         locationManager.delegate = self;
@@ -179,7 +184,13 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
             FIRDatabase.database().reference().child("routes").child(currentRoute).child("public").observeSingleEvent(of: .value, with: { (routeDetailsSnap) in
                 self.title = (routeDetailsSnap.childSnapshot(forPath: "name").value as? String)!
                 let school = (routeDetailsSnap.childSnapshot(forPath: "school").value as? String)!
-                self.setUpAutoDropOff(school: school)
+                let lat = (routeDetailsSnap.childSnapshot(forPath: "location/lat").value as? Double)!
+                let lng = (routeDetailsSnap.childSnapshot(forPath: "location/lng").value as? Double)!
+                if (self.appUser?.currentTime.contains("am"))! {
+                    self.setUpAutoDropOff(school: school)
+                } else {
+                    self.setUpAutoDropOff(lat:lat, lng:lng)
+                }
             })
             FIRDatabase.database().reference().child("routes").child(currentRoute).child("private").child("status").observeSingleEvent(of: .value, with: { (routeStatusDetailsSnap) in
                 if(routeStatusDetailsSnap.exists()){
@@ -226,7 +237,7 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
                     }
                 }
                 if(self.routeStatus != "dropped off") {
-                    self.startScanning()
+                    //self.startScanning()
                 }
             }) { (error) in
                 //code here not called either
@@ -237,6 +248,10 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        UIApplication.shared.isIdleTimerDisabled = false
     }
     
     func loadSingleStudent(studentKey: String){
@@ -289,12 +304,37 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
             }
         })
     }
+    func setUpAutoDropOff(lat: Double, lng:Double) {
+        // 1. check if system can monitor regions
+        if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
+            
+            // 2. region data
+            let title = "School"
+            //let coordinate = CLLocationCoordinate2DMake(30.286395, -97.744514)
+            let coordinate = CLLocationCoordinate2DMake(lat, lng)
+            let regionRadius = 100.0
+            
+            // 3. setup region
+            let region = CLCircularRegion(center: CLLocationCoordinate2D(latitude: coordinate.latitude,
+                                                                         longitude: coordinate.longitude), radius: regionRadius, identifier: title)
+            
+            region.notifyOnEntry=true
+            region.notifyOnExit=true
+            
+            locationManager.startMonitoring(for: region)
+            locationManager.requestState(for: region)
+            
+        }
+        else {
+            print("System can't track regions")
+        }
+    }
     
     //MARK: - Functions
     func setUpAutoDropOff(school:String) {
         // 1. check if system can monitor regions
         if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
-            
+        
             // 2. region data
             let title = "School"
             //let coordinate = CLLocationCoordinate2DMake(30.286395, -97.744514)
@@ -335,6 +375,7 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
         else {
             print("System can't track regions")
         }
+        
     }
     
     //1. user enter region
@@ -406,9 +447,11 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
         cell.studentName.text = student.name
         cell.studentPhoto.image = student.photo
         cell.studentInfo.text = student.info
+        cell.foundButton.isHidden = true
         switch(student.status) {
             case "lost":
                 cell.studentStatus.textColor = .red
+                cell.foundButton.isHidden = false
                 break
             case "left behind":
                 cell.studentStatus.textColor = .gray
@@ -422,7 +465,22 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
             
         }
         cell.studentStatus.text = student.status
+        cell.foundButton.addTarget(self, action: #selector(self.updateStatus), for: .touchUpInside)
+        cell.foundButton.tag = indexPath.row
         return cell
+    }
+    
+    func updateStatus(sender:UIButton) {
+        let buttonRow = sender.tag
+        let currentStudent = students[buttonRow]
+        sender.isHidden = true
+        
+        currentStudent.status = "picked up"
+        
+        let indexPath = IndexPath(row: buttonRow, section: 0)
+        self.tableView.reloadRows(at: [indexPath], with: .none)
+        let databaseReference = FIRDatabase.database().reference().child("students").child(currentStudent.studentDatabaseId).child("status")
+        databaseReference.setValue(currentStudent.status)
     }
  
     
@@ -482,7 +540,9 @@ extension ChaperoneTableViewController: CBCentralManagerDelegate {
     }
     
     func stopScanning(){
-        peripherals.removeAll()
+        print ("Stopping scan and updating")
+        //print(Thread.callStackSymbols)
+
         if(self.routeStatus == "waiting") {
             for address in addressesFound {
                 if let student = bluetoothToStudentMap[address] { //ignore bluetooths that dont correspond to students
@@ -512,7 +572,7 @@ extension ChaperoneTableViewController: CBCentralManagerDelegate {
                 if let student = bluetoothToStudentMap[address] { //ignore bluetooths that dont correspond to students
                     if (student.status != "picked up") {
                         student.status = "picked up"
-                        student.scansSinceLastFound = 0
+                        student.timeLastFound = Date()
                         let databaseReference = FIRDatabase.database().reference().child("students").child(student.studentDatabaseId)
                         databaseReference.child("status").setValue("picked up")
                     }
@@ -526,8 +586,12 @@ extension ChaperoneTableViewController: CBCentralManagerDelegate {
             
             for lostBluetooth in studentsBluetooths {
                 if let student = bluetoothToStudentMap[lostBluetooth] {
-                    student.scansSinceLastFound += 1
-                    if student.status != "lost" && student.scansSinceLastFound >= 3 && student.status != "left behind"{
+                    let now = Date()
+                    //let timeSinceLastFound:Double = now.timeIntervalSinceDate(student.timeLastFound);
+                    
+                    if (student.status != "lost" &&
+                        (student.timeLastFound == nil || now.timeIntervalSince(student.timeLastFound!) > 30) &&
+                        student.status != "left behind" ) {
                         student.status = "lost"
                         let databaseReference = FIRDatabase.database().reference().child("students").child(student.studentDatabaseId)
                         databaseReference.child("status").setValue("lost")
@@ -540,16 +604,29 @@ extension ChaperoneTableViewController: CBCentralManagerDelegate {
             
         }
         
-        if (routeStatus != "dropped off"){
-            startScanning()
-        }
+        
 
         tableView.reloadData()
         addressesFound.removeAll()
         
+        //disconnect from all found peripherals cause l o l
+        /*for peripheral in self.peripherals {
+            self.centralManager?.cancelPeripheralConnection(peripheral)
+        } */
+        
+        
+        peripherals.removeAll()
+        
+        
+        if (routeStatus != "dropped off"){
+            startScanning()
+        }
+
+        
     }
     
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        print("in did update state")
         if (central.state == .poweredOn){
             startScanning()
         }
@@ -558,18 +635,20 @@ extension ChaperoneTableViewController: CBCentralManagerDelegate {
         }
     }
     
+    
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         if let pName = peripheral.name{
             if(expectedTags.contains(pName) && !peripherals.contains(peripheral)){
-                print("\nNew expected tag found! \(peripheral)")
+                //print("\nNew expected tag found! \(peripheral)")
                 peripherals.append(peripheral)
+                //self.centralManager?.connect(peripheral, options: nil)
                 if let manufacturerData = advertisementData["kCBAdvDataManufacturerData"] as? Data{
                     assert(manufacturerData.count>=7)
                     
                     //0d00 - TI manufacturer ID - 2 byte
                     var manufacturerID = String(format: "%02X", (manufacturerData[0]))
                     manufacturerID += String(format: "%02X", (manufacturerData[1]))
-                    print("Manufacturer ID: \(manufacturerID)")
+                    //print("Manufacturer ID: \(manufacturerID)")
                     
                     //6 byte MAC address
                     var MACAddress = String(format: "%02X", manufacturerData[2])
