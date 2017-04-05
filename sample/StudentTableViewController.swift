@@ -123,7 +123,7 @@ class StudentTableViewController: UITableViewController {
         //delete from routes
         for (time, route) in student.schedule {
             if route[0] != "" {
-                databaseReference.child(route[0]).child("students").child(time).child(student.studentDatabaseId).removeValue()
+                databaseReference.child("routes").child(route[0]).child("private").child("students").child(time).child(student.studentDatabaseId).removeValue()
             }
         }
         //delete from school

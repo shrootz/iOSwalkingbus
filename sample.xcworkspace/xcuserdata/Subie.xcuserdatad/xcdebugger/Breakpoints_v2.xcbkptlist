@@ -31,8 +31,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "25"
             endingLineNumber = "25"
-            landmarkName = "init(name:photo:schoolName:info:schedule:studentDatabaseId:schoolDatabaseId:bluetooth:status:)"
-            landmarkType = "7">
+            landmarkName = "Student"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
