@@ -14,7 +14,7 @@ class ChaperoneStudentTableViewCell: UITableViewCell {
     @IBOutlet weak var studentStatus: UILabel!
     @IBOutlet weak var studentInfo: UILabel!
     @IBOutlet weak var studentPhoto: UIImageView!
-    
+    @IBOutlet weak var foundButton: UIButton!
     
     override func awakeFromNib() {
         super.awakeFromNib()

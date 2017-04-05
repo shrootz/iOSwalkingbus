@@ -84,6 +84,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         centralManager = CBCentralManager(delegate: self, queue: DispatchQueue.main)
         //expectedTags.append("CB4C2E61-FEF3-47FF-8AEC-67A9B883016C")
         expectedTags.append("WalkingBus")
+        expectedTags.append("Walking Bus")
         loadUI()
         loadStudentSchedule()
     }
@@ -531,6 +532,7 @@ extension EditStudentTableViewController: CBCentralManagerDelegate {
         else{
             displayToastMessage(displayText: "Too many student devices found")
         }
+        peripherals.removeAll()
     }
     
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
