@@ -274,15 +274,31 @@ class StudentTableViewController: UITableViewController {
                 print("Updated an existing student.")
                 students[selectedIndexPath.row] = student
                 tableView.reloadRows(at: [selectedIndexPath], with: .none)
-            }
-            else {
-                print("Added a new student")
-                let newIndexPath = IndexPath(row: students.count, section: 0)
-                students.append(student)
-                self.appUser = sourceViewController.appUser
-                tableView.insertRows(at: [newIndexPath], with: .bottom)
+            } else if let index = (studentInDB(databaseID: student.schoolDatabaseId)){
+                if(index < 0) {
+                    print("Added a new student")
+                    let newIndexPath = IndexPath(row: students.count, section: 0)
+                    students.append(student)
+                    self.appUser = sourceViewController.appUser
+                    tableView.insertRows(at: [newIndexPath], with: .bottom)
+                } else {
+                    print("Updated an existing student.")
+                    students[index] = student
+                    let indexPath = IndexPath(row: index, section: 0)
+                    tableView.reloadRows(at: [indexPath], with: .none)
+                    
+                }
             }
         }
+    }
+    
+    func studentInDB(databaseID: String) -> Int? {
+        for student in students {
+            if (student.studentDatabaseId == databaseID) {
+                return students.index(of: student)
+            }
+        }
+        return -1;
     }
     
     @IBAction func unwindToStudentListBack(sender: UIStoryboardSegue) {

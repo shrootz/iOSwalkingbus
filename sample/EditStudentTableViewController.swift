@@ -41,6 +41,11 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     var peripherals = Array<CBPeripheral>()
     var expectedTags = Array<String>()
     var MACAddress: String = ""
+    var selectedPeripheral: CBPeripheral?
+    var listOfMacAddress: [String] = []
+    var bluetoothTextField: UITextField?
+    let SCHOOL = 1
+    let BLUETOOTH = 2
     
     // MARK: UIImagePickerControllerDelegate
     
@@ -123,6 +128,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
             }
         }
         let schoolPicker = UIPickerView()
+        schoolPicker.tag = SCHOOL;
         schoolPicker.delegate = self
         schoolPicker.dataSource = self
         schoolTextView.inputView = schoolPicker
@@ -244,23 +250,35 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
     
     // The number of rows of data
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return schoolNamesForUI.count
+        if (pickerView.tag == SCHOOL) {
+            return schoolNamesForUI.count
+        } else {
+            return listOfMacAddress.count
+        }
     }
     
     // The data to return for the row and component (column) that's being passed in
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return schoolNamesForUI[row]
+        if (pickerView.tag == SCHOOL) {
+            return schoolNamesForUI[row]
+        } else {
+            return listOfMacAddress[row]
+        }
     }
     
     // Catpure the picker view selection
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        let lastSchool = schoolTextView.text
-        schoolTextView.text = schoolNamesForUI[row]
-        if(lastSchool != "" && lastSchool != schoolTextView.text) {
-            for(time, _) in (student?.schedule)! {
-                student?.schedule[time]?[1] = ""
+        if(pickerView.tag == SCHOOL) {
+            let lastSchool = schoolTextView.text
+            schoolTextView.text = schoolNamesForUI[row]
+            if(lastSchool != "" && lastSchool != schoolTextView.text) {
+                for(time, _) in (student?.schedule)! {
+                    student?.schedule[time]?[1] = ""
+                }
+                reloadRoutes()
             }
-            reloadRoutes()
+        } else {
+            bluetoothTextField?.text = listOfMacAddress[row]
         }
     }
     
@@ -294,6 +312,7 @@ class EditStudentTableViewController: UITableViewController, UITextFieldDelegate
         }
         else{
             self.displayToastMessage(displayText: "Scanning for a student device")
+            bluetoothButton.setTitle("Scanning...", for: .normal)
             self.startScanning()
         }
     }
@@ -522,17 +541,43 @@ extension EditStudentTableViewController: CBCentralManagerDelegate {
     }
     
     func stopScanning(){
-        if(peripherals.count == 0){
+        if(listOfMacAddress.count == 0){
             displayToastMessage(displayText: "No device found")
         }
-        else if (peripherals.count == 1){
+        else if (listOfMacAddress.count == 1){
             displayToastMessage(displayText: "Device found")
             bluetoothButton.setTitle("Forget my Device", for: .normal)
+            self.MACAddress = self.listOfMacAddress[0]
         }
         else{
-            displayToastMessage(displayText: "Too many student devices found")
+            let bluetoothPicker = UIPickerView()
+            bluetoothPicker.tag = BLUETOOTH
+            bluetoothPicker.delegate = self
+            bluetoothPicker.dataSource = self
+            let alert = UIAlertController(title: "Too Many Devices", message: "Select a device", preferredStyle: .alert)
+            
+            //2. Add the text field. You can configure it however you need.
+            alert.addTextField { (textField) in
+                textField.inputView = bluetoothPicker
+            }
+            bluetoothTextField = alert.textFields![0]
+            
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] (_) in
+                //DO SOMETHING HERE TO REMEMBER DEVICE
+                let textField = alert?.textFields![0]
+                self.MACAddress = (textField?.text)!
+                self.bluetoothButton.setTitle("Forget my Device", for: .normal)
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { [weak alert] (_) in
+                self.bluetoothButton.setTitle("Scan for Device", for: .normal)
+                self.MACAddress = ""
+            }))
+            self.present(alert, animated: true, completion: nil)
+
+            //displayToastMessage(displayText: "Too many student devices found")
         }
         peripherals.removeAll()
+        self.listOfMacAddress.removeAll();
     }
     
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
@@ -549,10 +594,13 @@ extension EditStudentTableViewController: CBCentralManagerDelegate {
                 if let manufacturerData = advertisementData["kCBAdvDataManufacturerData"] as? Data{
                     assert(manufacturerData.count>=7)
                     //6 byte MAC address
-                    MACAddress = String(format: "%02X", manufacturerData[2])
+                    var local_mac_address = String(format: "%02X", manufacturerData[2])
                     for i in 3...7  {
-                        MACAddress += ":"
-                        MACAddress += String(format: "%02X", manufacturerData[i])
+                        local_mac_address += ":"
+                        local_mac_address += String(format: "%02X", manufacturerData[i])
+                    }
+                    if(!listOfMacAddress.contains(local_mac_address)){
+                        listOfMacAddress.append(local_mac_address)
                     }
                 }
             }

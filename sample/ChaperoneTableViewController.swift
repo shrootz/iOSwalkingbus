@@ -53,7 +53,7 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
                     pickedUpCount += 1
                 }
             }
-            let alertTitle = "You are picking up " + String(pickedUpCount) + " students. " + String(registedCount) + " students are registered for this bus."
+            let alertTitle = "You are picking up " + String(pickedUpCount) + " students. " + String(registedCount) + " student(s) are registered for this bus."
             //1. Create the alert controller.
             let alert = UIAlertController(title: alertTitle, message: "Are you sure you want to leave?", preferredStyle: .alert)
             
@@ -97,7 +97,7 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
         }
         
         if lostCount != 0 {
-            let alertTitle = String(lostCount) + "students are lost."
+            let alertTitle = String(lostCount) + " student(s) are lost."
             //1. Create the alert controller.
             let alert = UIAlertController(title: alertTitle, message: "Are you sure you want to drop off?", preferredStyle: .alert)
             
@@ -291,15 +291,17 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
     func loadStudentPhoto(withLocation: String, forStudent:String) {
         print("Getting student photo from " + withLocation)
         FIRStorage.storage().reference().child(withLocation).data(withMaxSize: 10*1024*1024, completion: { (data, error) in
-            if let photo = UIImage(data: data!) {
-                for student in self.students{
-                    if student.studentDatabaseId == forStudent{
-                        student.photo = photo
-                        DispatchQueue.main.async{
-                            self.tableView.reloadData()
+            if data != nil {
+                if let photo = UIImage(data: data!) {
+                    for student in self.students{
+                        if student.studentDatabaseId == forStudent{
+                            student.photo = photo
+                            DispatchQueue.main.async{
+                                self.tableView.reloadData()
+                            }
                         }
-                    }
                     
+                    }
                 }
             }
         })
@@ -519,13 +521,30 @@ class ChaperoneTableViewController: UITableViewController, CLLocationManagerDele
     // MARK: - Navigation
     @IBAction func goHome(_ sender: UIBarButtonItem) {
         // Depending on style of presentation (modal or push presentation), this view controller needs to be dismissed in two different ways.
-        let isPresentingInAddStudentMode = presentingViewController is UINavigationController
-        
-        if isPresentingInAddStudentMode {
-            dismiss(animated: true, completion: nil)
+        if routeStatus == "picked up"{
+            let alert = UIAlertController(title: "Bus in progress", message: "Are you sure you want to stop tracking?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] (_) in
+                let isPresentingInAddStudentMode = self.presentingViewController is UINavigationController
+                
+                if isPresentingInAddStudentMode {
+                    self.dismiss(animated: true, completion: nil)
+                }
+                else {
+                    self.navigationController!.popViewController(animated: true)
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { [weak alert] (_) in}))
+            self.present(alert, animated: true, completion: nil)
         }
-        else {
-            navigationController!.popViewController(animated: true)
+        else{
+            let isPresentingInAddStudentMode = presentingViewController is UINavigationController
+        
+            if isPresentingInAddStudentMode {
+                dismiss(animated: true, completion: nil)
+            }
+            else {
+                navigationController!.popViewController(animated: true)
+            }
         }
         
     }
